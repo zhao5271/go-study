@@ -5,6 +5,7 @@
 ## 当前状态
 - 目标：从 Vue3/TypeScript/Node 转 Go 全栈（通用 API + MySQL）
 - 教学规则：每次输出严格 1)~5) 结构；示例代码 `fmt.Print*` 必须同行写典型输出注释；NotebookLM 优先，不足再上网补齐并写 References；不自动转 HTML；`go test` 暂不强制
+- 进行中：Day 03（struct / 方法 / 接口）— 已完成 Day 03.1（见 `notes/go/day03-struct-methods-basics.md`）
 
 ## 已完成
 | Day | 主题 | 产物 | 复习要点 |
@@ -13,5 +14,4 @@
 | Day 02 | 函数与错误处理：wrap、errors.Is/As、shadowing、defer、panic/recover、table-driven tests | 笔记：`notes/go/day02-functions-errors.md`；代码：`go-learning/cmd/day02_01_returns` ~ `go-learning/cmd/day02_05_panic_recover`；测试：`go-learning/internal/day02/users/users_test.go` | `%w` vs `%v`、sentinel vs typed error、shadowing、defer 三条规则、panic 边界、table-driven tests |
 
 ## 下一步（建议）
-- Day 03：`struct` / 方法 / 接口（对照 TS interface）→ 为后续 HTTP 分层与 MySQL repository 奠基
-
+- Day 03.2：接口（interface）/ 隐式实现 / embedding（对照 TS interface）→ 为后续 HTTP 分层与 MySQL repository 奠基
