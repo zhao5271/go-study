@@ -1,34 +1,33 @@
-# Day 03.1：struct 与方法（值/指针接收者）+ API 里的 optional 字段
+# Day 03.1：struct + 方法（值/指针接收者）+ API optional 字段（指针字段）
 
-> 目标：把 TS/Node 的“对象/类/接口”心智迁移到 Go 的 `struct` 与方法；并引入 API 常用的“可选字段”建模方式（指针字段）。
+> 贯穿项目：后台管理 API（RBAC + 登录鉴权 + 列表分页检索 + CRUD + 审计日志 + Docker 部署）  
+> 本日目标：把“数据结构 + 行为 + API 可选字段建模”打牢，为后面的 service/repo 分层与 PATCH 接口铺路。
 
-## 1) 知识讲解：概念 → 为什么（设计动机/取舍）
+统一运行目录：
+```bash
+cd /Users/zhang/Desktop/go-study/codex/go-learning
+```
 
-### 1.1 `struct` 是 Go 的“数据结构体”（偏数据，不偏继承）
-- `struct` 用来把一组字段组合成一个类型（更像 TS 的 object type + 数据载体）。
-- Go 没有 class 的继承链；更鼓励“组合（composition）”而非“继承（inheritance）”。
-- 字段没赋值会是 **零值（zero value）**：`int` 是 `0`、`string` 是 `""`、`bool` 是 `false`、指针是 `nil`。
+---
 
-### 1.2 方法（method）= “函数 + 接收者（receiver）”
-- Go 的方法本质是“带接收者的函数”，用于给类型绑定行为。
-- 关键取舍：**值接收者 vs 指针接收者**
-  - 值接收者：拿到的是副本（copy），适合不修改接收者、或者类型很小且逻辑明确的场景。
-  - 指针接收者：能修改接收者、避免大对象拷贝，通常更常见。
+## 知识点 1：`struct`（数据结构体）+ 零值（zero value）
 
-### 1.3 在 API 里，optional 字段常用“指针字段”区分“缺失 vs 显式零值”
-- TS 里你常用 `undefined` 表示缺失；Go 的基础类型没有 `undefined`，缺省就是零值。
-- 对 PATCH/部分更新场景，常见需求是区分：
-  - “客户端没传 admin 字段” vs “客户端明确传了 admin=false”
-- 解决方式：把字段改成指针：`*bool`、`*int`、`*string`，用 `nil` 表示缺失。
+### B. 一句话定义
+`struct` 把一组字段组合成一个类型；字段未赋值就是零值（0/""/false/nil）。
 
-## 2) 示例驱动：每个知识点后立刻可运行代码（全文）
+### C. 为什么重要（不做会怎样）
+你的后台管理项目里：用户、角色、权限、分页响应、错误响应，几乎都是 `struct`；不理解零值会导致“缺失 vs 有效 0 值”混淆。
 
-### 2.1 `struct` + 零值 + 复合字面量
+### D. 重难点拆解（2–4 条）
+1) **零值是语言契约**：不要把零值当“没初始化的垃圾”。  
+2) **组合优于继承**：Go 没有 class 继承链，结构体设计更偏“数据 + 组合”。  
+3) **输出可读性**：调试常用 `%+v` 看字段名和值。
 
-运行：
-- `cd go-learning && go run ./cmd/day03_01a_struct_zero`
+### E. 业务场景落地
+你会有 `User`、`Role`、`Permission`、`ListUsersResponse` 等 struct；零值决定了“缺省行为”。
 
-代码（全文）：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day03_01a_struct_zero/main.go`
+### F. 代码示例（最小可运行）
+文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day03_01a_struct_zero/main.go`
 ```go
 package main
 
@@ -54,12 +53,43 @@ func main() {
 }
 ```
 
-### 2.2 方法 + 值/指针接收者（是否能修改接收者）
+### G. 怎么运行（命令 + 预期现象）
+```bash
+go run ./cmd/day03_01a_struct_zero
+# Output: == Day03.1a: struct + zero value ==
+# Output: u={ID:0 Name: Admin:false}
+# Output: u2={ID:1 Name:Alice Admin:true}
+# Output: u3={ID:0 Name:Bob Admin:false}
+```
 
-运行：
-- `cd go-learning && go run ./cmd/day03_01b_methods_receivers`
+### H. 练习题（1–3 题）
+练习 1：给 `User` 加一个字段 `Age int`，并验证零值输出  
+- 验收标准：`Age` 在零值 `u` 中打印为 `0`
 
-代码（全文）：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day03_01b_methods_receivers/main.go`
+### I. 参考答案
+参考答案 1：  
+把 `Age int` 加进 struct，重新跑 `go run ./cmd/day03_01a_struct_zero`，输出里会出现 `Age:0`（典型输出可略有差异，但零值应为 0）。
+
+---
+
+## 知识点 2：方法（method）+ 值/指针接收者（receiver）取舍
+
+### B. 一句话定义
+方法就是“带接收者的函数”；值接收者操作副本，指针接收者操作同一个对象（可修改）。
+
+### C. 为什么重要（不做会怎样）
+你的 service/repo 类型几乎都会用方法组织行为；如果你接收者选错，会出现“以为修改了，其实没生效”的隐蔽 bug。
+
+### D. 重难点拆解（2–4 条）
+1) **要修改就用指针接收者**：这是最常见且最安全的经验法则。  
+2) **避免大对象拷贝**：结构体很大时，值接收者会拷贝成本高。  
+3) **Go 会自动取地址/解引用**：调用体验更顺，但你仍要明确语义。
+
+### E. 业务场景落地
+例如 `type UserService struct{ repo ... }`，方法 `CreateUser(...)` 基本都用指针接收者；否则你很难在内部维护状态（比如缓存、统计）。
+
+### F. 代码示例（最小可运行）
+文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day03_01b_methods_receivers/main.go`
 ```go
 package main
 
@@ -96,12 +126,47 @@ func main() {
 }
 ```
 
-### 2.3 API optional 字段（PATCH 思维）：用指针区分“缺失 vs 显式零值”
+### G. 怎么运行（命令 + 预期现象）
+```bash
+go run ./cmd/day03_01b_methods_receivers
+# Output: == Day03.1b: methods + value/pointer receiver ==
+# Output: after IncByValue: c.N=10
+# Output: after IncByPtr:   c.N=11
+# Output: cp.N=21
+```
 
-运行：
-- `cd go-learning && go run ./cmd/day03_01c_json_optional_fields`
+### H. 练习题（1–3 题）
+练习 1：把 `IncByValue` 改成返回新值（不改原对象），并在 main 里用返回值更新 `c`  
+- 验收标准：你能得到最终 `c.N=11`（注意输出标注规则）
 
-代码（全文）：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day03_01c_json_optional_fields/main.go`
+### I. 参考答案
+参考答案 1（示例思路）：  
+把 `IncByValue()` 改成：
+```go
+func (c Counter) IncByValue() Counter { c.N++; return c }
+```
+然后 `c = c.IncByValue()`。
+
+---
+
+## 知识点 3：API optional 字段（PATCH）：用指针区分“缺失 vs 显式零值”
+
+### B. 一句话定义
+把字段声明成 `*T`：`nil` 表示“没传”；非 `nil` 表示“传了（即使值是零值）”。
+
+### C. 为什么重要（不做会怎样）
+后台管理里“编辑用户/部分更新”非常常见：如果你用基础类型，你分不清“没传 admin”与“传了 admin=false”，会把数据改错。
+
+### D. 重难点拆解（2–4 条）
+1) **`omitempty` 的语义**：`nil` 指针会被省略；非 nil 即使是 false/0 也会出现。  
+2) **只更新非 nil 字段**：这是 PATCH 的核心逻辑。  
+3) **不要把 optional 滥用到响应**：响应一般用非指针，让调用方更省心（除非你明确要表达“未知/缺失”）。
+
+### E. 业务场景落地
+`PATCH /api/v1/users/{id}`：前端可能只传 `{ "admin": false }`，你必须把它当成“显式设置”，而不是“缺省”。
+
+### F. 代码示例（最小可运行）
+文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day03_01c_json_optional_fields/main.go`
 ```go
 package main
 
@@ -136,42 +201,28 @@ func main() {
 }
 ```
 
-## 3) 常见坑（结合 TS/Node 习惯对照）
+### G. 怎么运行（命令 + 预期现象）
+```bash
+go run ./cmd/day03_01c_json_optional_fields
+# Output: == Day03.1c: JSON optional fields (pointer) ==
+# Output: missing: nameNil=true adminNil=true
+# Output: explicit false: adminNil=false adminVal=false
+# Output: marshal: {"name":"Alice","admin":true}
+```
 
-1) **以为“值接收者也能改原对象”**
-- TS 里对象默认引用语义；Go 里 `struct` 值是“按值拷贝”。
-- 经验法则：只要方法需要修改接收者，直接用指针接收者 `func (x *T) ...`。
+### H. 练习题（1–3 题）
+练习 1：写一个 `ApplyPatch`：只更新非 nil 字段（纯内存，不接 DB）  
+- 验收标准：
+  - 传 `{}` 不改变 user
+  - 传 `{"admin": false}` 会把 user.Admin 设置为 false
 
-2) **把“字段缺失”误当成“字段为零值”**
-- TS 的 `undefined` 很常见；Go 基础类型没这个概念。
-- 做 PATCH/可选字段时，用指针字段（`*T`）或 `sql.Null*`/自定义 Optional 类型表达“是否出现”。
+### I. 参考答案
+参考答案 1（可运行做法）：  
+你可以先在 `day03_01c_json_optional_fields/main.go` 里加一个 `User` struct 和 `ApplyPatch(user, req)` 函数，最后 `fmt.Printf` 打印更新前后（打印要写典型输出注释）。
 
-3) **在切片里存 `struct`，在循环里修改却没生效**
-- `for _, v := range sliceOfStruct { v.Field = ... }` 修改的是副本。
-- 解决：用索引遍历 `for i := range s { s[i].Field = ... }` 或存指针 `[]*T`。
-
-## 4) 工程用法/最佳实践：真实 API 项目怎么落地
-
-- 分层建模（对齐你 Node/Java 经验）：
-  - `transport/http`：请求/响应 DTO（带 `json` tag），与路由/校验强绑定
-  - `service`：业务输入/输出结构（更贴业务语义，尽量不暴露 transport 细节）
-  - `repo`：DB 实体与查询结果（字段更贴数据库）
-- PATCH 语义建议（配合 `api-design-principles` 的“清晰一致”原则）：
-  - 如果是“部分更新”，请求体里用指针字段区分“缺失”与“显式零值”
-  - 响应体一般用非指针字段（客户端更省心），除非你确实要表达“未知/缺失”
-
-## 5) 练习策略：可直接作为“运用示例”（含完整参考实现与讲解）
-
-练习目标：做一个“用户 PATCH 更新”的纯内存版本（先不接 MySQL），把 optional 字段逻辑跑通。
-
-要求（你自己写时建议对照这份参考实现）：
-- 入参：`PatchUserRequest`（指针字段）
-- 逻辑：只更新非 nil 的字段
-- 返回：更新后的用户
-
-下一小步我会带你把它抽成 `service` 包（不引入 `go test`，只用 `go run` 验证）。
+---
 
 ## References
-- [A Tour of Go: Structs](https://go.dev/tour/moretypes/2)（官方：struct 基础与字面量）
-- [A Tour of Go: Methods](https://go.dev/tour/methods/1)（官方：方法与接收者）
-- [Effective Go](https://go.dev/doc/effective_go)（官方：Go 风格与工程化建议）
+- 官方：A Tour of Go（Structs）https://go.dev/tour/moretypes/2
+- 官方：A Tour of Go（Methods）https://go.dev/tour/methods/1
+- 官方：Effective Go https://go.dev/doc/effective_go

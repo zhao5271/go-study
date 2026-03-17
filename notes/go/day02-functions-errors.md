@@ -1,30 +1,33 @@
-# Go 全栈学习笔记 - Day 02：函数与错误处理（TS/Node → Go）
+# Day 02：函数与错误处理（把失败建模成可控的工程接口）
 
-> 今日目标：把“函数 + (value, error) + errors.Is/As + defer + table-driven tests”变成肌肉记忆。对你这种 TS/Vue/Node 背景来说，这是从 try/catch 思维切到 Go 工程思维的关键一步。
+> 贯穿项目：后台管理 API（RBAC + 登录鉴权 + 列表分页检索 + CRUD + 审计日志 + Docker 部署）  
+> 本日目标：把 `(value, error)`、wrap、`errors.Is/As`、defer 变成肌肉记忆（后面做 HTTP/MySQL 都靠它）。
 
-## 1) 知识讲解：概念 → 为什么（设计动机/取舍）
-
-### 1.1 函数签名与多返回值（为什么 Go 不推崇重载/默认参数）
-**概念**
-- Go 函数可以返回多个值：`func f() (a, b int)`
-- 典型工程约定：`(value, error)`，把“失败”显式建模成返回值，而不是异常。
-
-**为什么**
-- 取舍：Go 牺牲了语言层面的一些花活（重载、默认参数、异常），换来可读性与工程一致性。
-- 多返回值让你在不引入额外对象/结构的情况下表达更多结果（对照 TS/Node：你常用对象/元组返回）。
-
-**对照 TS/Node**
-- Node 常见：返回 `{data, error}` 或 `throw` + `try/catch`。
-- Go 常见：`return data, nil` / `return zero, err`，并要求你在调用处显式处理 `err`。
-
-#### 可运行例子（紧跟）
-运行：
+统一运行目录：
 ```bash
 cd /Users/zhang/Desktop/go-study/codex/go-learning
-go run ./cmd/day02_01_returns
 ```
 
-代码（可直接阅读）：
+---
+
+## 知识点 1：多返回值 + 命名返回值（Go 的“函数签名表达力”）
+
+### B. 一句话定义
+Go 函数可以返回多个值；命名返回值会变成真实变量（默认是零值）。
+
+### C. 为什么重要（不做会怎样）
+你后面写 service/repo 时，常见签名就是 `(...)(T, error)`；如果你对多返回值不熟，代码会变得啰嗦且容易漏错误处理。
+
+### D. 重难点拆解（2–4 条）
+1) **命名返回值不是“语法糖”**：它是真变量，会有零值。  
+2) **少用“裸返回”**：只在非常短小函数里使用；否则可读性下降（你自己未来会骂自己）。  
+3) **工程约定**：对外暴露接口优先 `(T, error)`，不要搞魔法返回。
+
+### E. 业务场景落地
+例如“创建用户”：返回 `userID, err`；“列表分页”：返回 `items, total, err`。
+
+### F. 代码示例（最小可运行）
+文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day02_01_returns/main.go`
 ```go
 package main
 
@@ -58,31 +61,46 @@ func namedZero() (x int) {
 }
 ```
 
----
-
-### 1.2 错误是值：`(value, error)` + wrap + `errors.Is/As`
-**概念**
-- `error` 是接口：任何实现 `Error() string` 的类型都能当 error。
-- **sentinel error**：用一个全局 `var ErrXxx = errors.New("...")` 表示可匹配的错误条件。
-- **typed error**：用自定义类型承载结构化信息（可用 `errors.As` 提取）。
-- **wrap**：用 `fmt.Errorf("...: %w", err)` 在不丢失根因的情况下加上下文；上层用 `errors.Is/As` 匹配错误链。
-
-**为什么**
-- `errors.Is/As` 让你“既能给人看的上下文”，又能“给程序看的可匹配语义”。
-- 是否 `%w` 很关键：wrap 了就等于把底层错误语义暴露成 API 的一部分（对封装/抽象有影响）。
-
-**对照 TS/Node**
-- TS 里通常 `throw new Error(...)`，上层靠 `instanceof` 或 message 判断（脆弱）。
-- Go 倾向于：稳定语义（sentinel/type）+ 上下文（wrap），且调用处显式处理。
-
-#### 可运行例子（紧跟）
-运行：
+### G. 怎么运行（命令 + 预期现象）
 ```bash
-cd /Users/zhang/Desktop/go-study/codex/go-learning
-go run ./cmd/day02_02_errors
+go run ./cmd/day02_01_returns
+# Output: == Day02.1: functions + multiple returns + named returns ==
+# Output: split(10) => x=4 y=6
+# Output: divmod(17,5) => q=3 r=2
+# Output: namedZero()=0
 ```
 
-代码（可直接阅读）：
+### H. 练习题（1–3 题）
+练习 1：写一个 `ListUsers(page,size)` 的函数签名（先不实现），返回 `items, total, err`  
+- 验收标准：签名是 `([]T, int, error)` 或 `([]User, int, error)` 这种形态，不要把 error 藏到结构体里
+
+### I. 参考答案
+参考答案 1（示例签名）：
+```go
+func ListUsers(page, size int) (items []User, total int, err error) { /* ... */ }
+```
+
+---
+
+## 知识点 2：错误是值：sentinel / typed error + wrap（`%w`）+ `errors.Is/As`
+
+### B. 一句话定义
+Go 的错误是普通值：你可以用“可匹配语义（sentinel/type）+ 上下文（wrap）”同时满足“给程序判断”和“给人排障”。
+
+### C. 为什么重要（不做会怎样）
+后台管理 API 的错误要稳定：前端要按错误码处理，后端要按错误语义做分支；如果你只靠字符串 message，系统会非常脆弱。
+
+### D. 重难点拆解（2–4 条）
+1) **不要用 `==` 判断错误**：一旦 wrap 了就不可靠，应该 `errors.Is/As`。  
+2) **`%w` 是“对上层承诺语义”**：你 wrap 了，就等于允许上层用 `errors.Is/As` 看见底层语义；不想暴露就用 `%v`。  
+3) **sentinel vs typed**：sentinel 更简单；typed 能携带结构化字段（Resource/ID），更适合做统一错误映射。
+
+### E. 业务场景落地
+例如 repo 层“找不到用户”：
+- service 层要能判断是 NotFound（映射 404）还是 DB 真的挂了（映射 500）
+
+### F. 代码示例（最小可运行）
+入口文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day02_02_errors/main.go`
 ```go
 package main
 
@@ -103,7 +121,7 @@ func main() {
 	fmt.Printf("errors.Unwrap(err)=%v\n", errors.Unwrap(err))                                 // Output: errors.Unwrap(err)=user not found
 
 	hidden := fmt.Errorf("hide: %v", users.ErrUserNotFound)
-	fmt.Printf("hidden=%v\n", hidden)                         // Output: hidden=hide: user not found
+	fmt.Printf("hidden=%v\n", hidden)                               // Output: hidden=hide: user not found
 	fmt.Printf("errors.Unwrap(hidden)=%v\n", errors.Unwrap(hidden)) // Output: errors.Unwrap(hidden)=<nil>
 
 	_, err = users.FindUserTyped(2)
@@ -115,24 +133,104 @@ func main() {
 }
 ```
 
----
+被调用的内部实现（为了你阅读完整链路）：
 
-### 1.3 `if err := ...; err != nil` 与 `:=` shadowing
-**概念**
-- `if v, err := f(); err != nil { ... }` 是 Go 常见写法：把临时变量作用域收紧在 if 内。
-- 坑：你以为更新了外层 `err`，实际上 `:=` 在 if 内创建了新变量，外层 `err` 不变。
+文件：`/Users/zhang/Desktop/go-study/codex/go-learning/internal/day02/users/users.go`
+```go
+package users
 
-**为什么**
-- 取舍：更短、更局部、更不容易把临时变量泄漏到函数其它部分；但你必须理解 shadowing。
+import (
+	"errors"
+	"fmt"
+)
 
-#### 可运行例子（紧跟）
-运行：
-```bash
-cd /Users/zhang/Desktop/go-study/codex/go-learning
-go run ./cmd/day02_03_shadowing
+type User struct {
+	ID   int
+	Name string
+}
+
+// ErrUserNotFound is a sentinel error. Callers should match it with errors.Is
+// (not ==), because we return it wrapped with context.
+var ErrUserNotFound = errors.New("user not found")
+
+// NotFoundError is a typed error. Callers can inspect it with errors.As.
+type NotFoundError struct {
+	Resource string
+	ID       int
+}
+
+func (e *NotFoundError) Error() string {
+	return fmt.Sprintf("%s %d not found", e.Resource, e.ID)
+}
+
+func FindUserSentinel(id int) (User, error) {
+	if id == 1 {
+		return User{ID: 1, Name: "Gopher"}, nil
+	}
+	return User{}, fmt.Errorf("find user %d: %w", id, ErrUserNotFound)
+}
+
+func FindUserTyped(id int) (User, error) {
+	if id == 1 {
+		return User{ID: 1, Name: "Gopher"}, nil
+	}
+	return User{}, fmt.Errorf("find user %d: %w", id, &NotFoundError{Resource: "user", ID: id})
+}
 ```
 
-代码（可直接阅读）：
+### G. 怎么运行（命令 + 预期现象）
+```bash
+go run ./cmd/day02_02_errors
+# Output: == Day02.2: (value, error) + wrap + errors.Is/As ==
+# Output: sentinel err=find user 2: user not found
+# Output: errors.Is(err, ErrUserNotFound)=true
+# Output: errors.Unwrap(err)=user not found
+# Output: hidden=hide: user not found
+# Output: errors.Unwrap(hidden)=<nil>
+# Output: typed err=find user 2: user 2 not found
+# Output: errors.As(err, *NotFoundError)=true
+# Output: nf.Resource=user nf.ID=2
+```
+
+### H. 练习题（1–3 题）
+练习 1：把 `FindUserSentinel(2)` 的错误再 wrap 一层上下文（多包一层 `%w`），验证 `errors.Is` 仍然是 true  
+- 验收标准：`errors.Is(err, ErrUserNotFound)=true` 仍成立
+
+练习 2：把 typed error 增加一个字段 `Reason`（字符串），并在上层打印出来  
+- 验收标准：你能通过 `errors.As` 拿到 `Reason`
+
+### I. 参考答案
+参考答案 1（可运行做法）：  
+在 `users.FindUserSentinel` 的 not found 分支再包一层：
+```go
+err := fmt.Errorf("find user %d: %w", id, ErrUserNotFound)
+return User{}, fmt.Errorf("repo: %w", err)
+```
+然后运行 `go run ./cmd/day02_02_errors`，`errors.Is` 仍然为 true。
+
+参考答案 2（可运行做法）：  
+给 `NotFoundError` 加字段 `Reason string`，并在构造处赋值；上层 `nf.Reason` 打印（打印要写典型输出注释）。
+
+---
+
+## 知识点 3：控制流里的错误处理坑（shadowing）+ `defer` 三条规则 + panic/recover 的边界
+
+### B. 一句话定义
+`if err := ...` 会缩小变量作用域但可能触发 shadowing；`defer` 用来可靠释放资源；panic/recover 只做边界兜底，不做业务流程。
+
+### C. 为什么重要（不做会怎样）
+你后面写 DB/HTTP 时会大量出现：打开资源后释放、错误向上返回、入口兜底防崩；这三件事搞错，会直接变成线上事故（资源泄漏/错误被吞/服务崩溃）。
+
+### D. 重难点拆解（2–4 条）
+1) **shadowing**：`:=` 在块内可能新建同名变量，外层变量不会被更新。  
+2) **defer 参数求值时机**：defer 的参数在“声明 defer 时”就求值。  
+3) **panic/recover 边界**：recover 只能在 defer 内生效，且只对当前 goroutine；业务失败应返回 error。
+
+### E. 业务场景落地
+- 你写 `db.Query()` 后一定要 `defer rows.Close()`；写 handler 要有统一错误响应；服务入口可加 recover 兜底避免整个进程崩掉（但要记录日志）。
+
+### F. 代码示例（最小可运行）
+文件 1（shadowing）：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day02_03_shadowing/main.go`
 ```go
 package main
 
@@ -160,24 +258,7 @@ func main() {
 }
 ```
 
----
-
-### 1.4 `defer`：资源释放、LIFO、参数求值时机、具名返回值
-**概念**
-- `defer` 常用于“打开资源后立刻写关闭”，避免遗漏。
-- 规则（一定要背下来）：
-  1) defer 的参数**在 defer 语句执行时就求值**
-  2) defer **LIFO**（后进先出）
-  3) defer 可以读写**具名返回值**
-
-#### 可运行例子（紧跟）
-运行：
-```bash
-cd /Users/zhang/Desktop/go-study/codex/go-learning
-go run ./cmd/day02_04_defer
-```
-
-代码（可直接阅读）：
+文件 2（defer）：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day02_04_defer/main.go`
 ```go
 package main
 
@@ -216,22 +297,7 @@ func namedReturn() (result int) {
 }
 ```
 
----
-
-### 1.5 panic vs error + recover（边界兜底）
-**概念**
-- **业务失败**：返回 `error`（别把 panic 当 throw 用）
-- **panic**：程序员错误/不可恢复情况（越界、空指针等）
-- **recover**：只能在 defer 里生效，用于边界兜底（注意：只对当前 goroutine）
-
-#### 可运行例子（紧跟）
-运行：
-```bash
-cd /Users/zhang/Desktop/go-study/codex/go-learning
-go run ./cmd/day02_05_panic_recover
-```
-
-代码（可直接阅读）：
+文件 3（panic/recover）：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day02_05_panic_recover/main.go`
 ```go
 package main
 
@@ -249,10 +315,10 @@ func main() {
 	fmt.Printf("business err=%v\n", err) // Output: business err=find user 2: user not found
 
 	// Panic is for programmer errors / truly unrecoverable situations.
-	fmt.Println("panic demo start") // Output: panic demo start
+	fmt.Println("panic demo start")                              // Output: panic demo start
 	fmt.Printf("recovered=%v\n", safe(func() { panic("boom") })) // Output: recovered=boom
 	fmt.Printf("recovered(no panic)=%v\n", safe(func() {}))      // Output: recovered(no panic)=<nil>
-	fmt.Println("still running")                                // Output: still running
+	fmt.Println("still running")                                 // Output: still running
 }
 
 func safe(fn func()) (recovered any) {
@@ -264,53 +330,61 @@ func safe(fn func()) (recovered any) {
 }
 ```
 
----
-
-### 1.6 Table-driven tests：把测试当第一等公民
-**概念**
-- Go 社区非常推崇 table-driven tests：把“测试数据表”和“断言逻辑”分离，便于扩展用例。
-- 常用模式：`tests := []struct{...}{...}; for _, tt := range tests { t.Run(tt.name, func(t *testing.T){...}) }`
-
-#### 可运行例子（紧跟）
-本节暂时**不要求你运行 `go test`**（你已说明目前不需要）。先把写法与结构看懂即可：
-- 测试代码在：`/Users/zhang/Desktop/go-study/codex/go-learning/internal/day02/users/users_test.go:1`
-- 你想跑的时候再用：
+### G. 怎么运行（命令 + 预期现象）
 ```bash
-cd /Users/zhang/Desktop/go-study/codex/go-learning
-go test ./... -run TestFindUser
+go run ./cmd/day02_03_shadowing
+# Output: == Day02.3: if init + := shadowing ==
+# Output: outer: user.ID=1 err=<nil>
+# Output: inside if: err=find user 2: user not found
+# Output: after if: outer err=<nil>
+# Output: after assignment: err=find user 2: user not found
+
+go run ./cmd/day02_04_defer
+# Output: == Day02.4: defer (LIFO / args eval / named return) ==
+# Output: demoLIFO start
+# Output: demoLIFO end
+# Output: defer 2
+# Output: defer 1
+# Output: demoArgs start
+# Output: now x=2
+# Output: demoArgs end
+# Output: defer x=1
+# Output: namedReturn()=2
+
+go run ./cmd/day02_05_panic_recover
+# Output: == Day02.5: panic vs error + recover ==
+# Output: business err=find user 2: user not found
+# Output: panic demo start
+# Output: recovered=boom
+# Output: recovered(no panic)=<nil>
+# Output: still running
 ```
 
-## 2) 常见坑（结合 TS/Node 习惯对照）
-- **不要用 `==` 匹配错误**：上层要用 `errors.Is/As`（尤其当你 wrap 了错误时）。
-- **滥用 `%w` 会泄漏实现细节**：wrap 会把底层错误语义变成 API 承诺；不想承诺就用 `%v` 仅给人看。
-- **shadowing**：`if _, err := ...` 不会更新外层 `err`。
-- **defer 在循环里**：循环里 defer 可能导致资源直到函数结束才释放（文件句柄/锁）。
-- **recover 只能在 defer 生效**：而且只对当前 goroutine。
+### H. 练习题（1–3 题）
+练习 1：在 `day02_03_shadowing` 里增加一个“如果发生错误就 return”的逻辑，确保使用 `=` 更新外层 err  
+- 验收标准：当找不到用户时，函数最终能拿到外层 err（不是 `<nil>`）
 
-## 3) 工程用法/最佳实践（真实 API 项目中怎么落地）
-- API handler 的套路：`v, err := svc.Do(ctx, req); if err != nil { ... }`（错误向上返回，入口统一转换成 HTTP 响应）。
-- 错误对外暴露：对外尽量用稳定语义（sentinel/type），不要把底层库错误当 API 细节泄漏。
-- 错误信息写法：上下文要短（避免“failed to ... failed to ...”层层堆叠）。
-- 测试优先覆盖错误分支：尤其是“not found / invalid input / timeout”等业务关键路径。
+练习 2：写下 defer 三条规则，并用 `day02_04_defer` 的输出逐条对照证明  
+- 验收标准：你能解释为什么 `defer x=1` 而不是 2
 
-## 4) 练习策略（练习可直接作为“运用示例”，提供完整参考实现）
-完整参考实现就是今天这些可运行示例 + 可运行测试：
-- `go run ./cmd/day02_01_returns`
-- `go run ./cmd/day02_02_errors`
-- `go run ./cmd/day02_03_shadowing`
-- `go run ./cmd/day02_04_defer`
-- `go run ./cmd/day02_05_panic_recover`
-- （可选）`go test ./... -run TestFindUser`
+### I. 参考答案
+参考答案 1：  
+把 `if _, err := ...` 改成：
+```go
+_, err = users.FindUserSentinel(2)
+if err != nil {
+	// ...
+}
+```
 
-建议你做 2 个“改造练习”（直接改现有代码即可）：
-1) 在 `FindUserSentinel` 的 not found 分支再 wrap 一层上下文（多一层 `%w`），观察 `errors.Is` 仍然为 true。
-2) 在 `day02_03_shadowing` 里故意写一个“需要外层 err 更新”的逻辑分支，然后用 `=` 修复（体会 shadowing 的风险）。
+参考答案 2：  
+对照输出：`defer x=1` 是因为 defer 的参数在“写 defer 的那一刻”就求值了（不是执行时求值）。
+
+---
 
 ## References
-- 官方：`https://go.dev/blog/go1.13-errors` — `%w`、wrap、`errors.Is/As/Unwrap` 的官方语义与取舍
-- 官方：`https://pkg.go.dev/errors` — `errors.Is/As/Unwrap` API 文档
-- 官方：`https://pkg.go.dev/fmt#Errorf` — `fmt.Errorf` 中 `%w` 的行为说明
-- 官方：`https://go.dev/blog/defer-panic-and-recover` — defer/panic/recover 的三条规则与工作机制
-- 官方：`https://go.dev/blog/subtests` — `t.Run` 子测试与 table-driven 的典型用法
-- 官方：`https://pkg.go.dev/testing` — testing 包与 `go test` 行为说明
-- 社区：`https://github.com/uber-go/guide/blob/master/style.md` — 工程实践：错误命名、wrap 取舍、错误处理模式
+- 官方：Go 1.13 errors（wrap/%w/Is/As）https://go.dev/blog/go1.13-errors
+- 官方：errors 包 https://pkg.go.dev/errors
+- 官方：fmt.Errorf（%w）https://pkg.go.dev/fmt#Errorf
+- 官方：defer/panic/recover https://go.dev/blog/defer-panic-and-recover
+- 社区：Uber Go Style Guide（工程错误处理取舍）https://github.com/uber-go/guide/blob/master/style.md

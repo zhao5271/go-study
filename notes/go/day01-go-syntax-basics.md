@@ -1,160 +1,259 @@
-# Go 全栈学习笔记 - Day 01：语法地基（TS/Vue/Node → Go）
+# Day 01：语法地基（可运行示例 + 可复习笔记）
 
-> 今日目标：把 Go 的“包/导入、变量与零值、函数与错误、控制流、slice/map”打牢，并且形成工程化习惯（可运行代码 + 可复习笔记）。
+> 贯穿项目：后台管理 API（RBAC + 登录鉴权 + 列表分页检索 + CRUD + 审计日志 + Docker 部署）  
+> 本日目标：你先把 Go 的“工程入口/包机制/零值/错误处理/集合类型”跑通，后面接 HTTP/MySQL 才不会踩基础坑。
 
-## 1) 知识讲解：概念 → 为什么（设计动机/取舍）
-
-### 1.1 `package` / `import` 与导出规则（首字母大小写）
-**概念**
-- Go 的组织单位是 **package**：目录通常对应一个包（工程上强调清晰依赖）。
-- 可见性规则：**首字母大写 = 导出（public）**；小写 = 包内私有（package-private）。
-
-**为什么**
-- 取舍：不用 `public/private/export` 关键字，靠命名约定控制可见性，语法更轻。
-- 编译期更严格：未使用的 import 会直接报错，逼你保持依赖干净。
-
-**对照 TS/Node**
-- TS 通过 `export` 控制模块边界；Go 则通过 package + 名字大小写控制对外 API。
-
-### 1.2 `var` + 零值（Zero Value）
-**概念**
-- Go 没有 `undefined`：声明即初始化为零值（0/""/false/nil）。
-
-**为什么**
-- 取舍：牺牲“未定义状态”的表达力，换来工程稳定性（减少没初始化就用）。
-
-**对照 TS/Node**
-- TS/JS 里 `undefined/null` 分支多、运行期才爆；Go 把很多问题提前到编译期 + 零值语义。
-
-### 1.3 `:=` 短变量声明（函数内）
-**概念**
-- `x := 42` = 声明 + 赋值 + 类型推导；只能在函数体内使用。
-
-**为什么**
-- 取舍：更快写更短，但仍然是静态强类型（类型确定后不会变）。
-
-### 1.4 显式类型转换 + `const`
-**概念**
-- Go 不做隐式数值转换（`int`/`int64` 必须显式转换）。
-- `const` 更强调“编译期常量”。
-
-**为什么**
-- 取舍：多写一点转换，换来精度/溢出等边界更可控。
-
-### 1.5 函数 + `(value, error)`（替代 try/catch）
-**概念**
-- Go 常用多返回值：`(value, error)`，调用点显式检查 `err`。
-
-**为什么**
-- 取舍：控制流显式化，避免异常穿透边界“漏处理”。
-
-### 1.6 控制流：`if` / `for` / `switch`
-**概念**
-- `if` 支持 init：`if x := ...; x > 0 {}`（让临时变量作用域更小）
-- `for` 是唯一循环关键字（经典/while-like/range）
-- `switch` 默认 `break`；只有 `fallthrough` 才继续下一个 case
-
-### 1.7 `slice` / `map` 与 “nil vs empty”
-**概念**
-- `slice` 是“底层数组的视图”，可能共享底层数组（高性能但要理解引用语义）。
-- `map` 必须 `make` 后才能写入；`nil map` 写会 panic。
-- `nil slice` 与 `empty slice` 在 JSON 编码上可能不同：`null` vs `[]`。
-- `map` 遍历顺序不保证稳定。
-
----
-
-## 2) 示例驱动：每个知识点后立刻给一段可运行代码
-
-统一进入项目：
+统一运行目录：
 ```bash
 cd /Users/zhang/Desktop/go-study/codex/go-learning
 ```
 
-### 2.1 package/import + 导出规则
-运行：
+---
+
+## 知识点 1：`package` / `import` / 导出规则（首字母大小写）+ 工程入口（cmd）
+
+### B. 一句话定义
+Go 用 **package** 组织代码；标识符 **首字母大写**表示包外可见；`cmd/` 里放可运行入口。
+
+### C. 为什么重要（不做会怎样）
+后台管理 API 很快会出现：handler/service/repo/config 等多模块；如果你不理解 package 边界和可见性，工程会变成“随便互相引用”，后期重构成本爆炸。
+
+### D. 重难点拆解（2–4 条）
+1) **未使用 import/变量会编译失败**：Go 用编译器强制你保持依赖干净。  
+2) **导出规则是约定而不是关键字**：只看首字母大小写。  
+3) **入口与库分离**：`cmd/` 只负责启动/演示，复用逻辑放 `internal/`（后面会用到）。
+
+### E. 业务场景落地
+你后面会写 `cmd/server` 启动 HTTP 服务，同时 `internal/api`/`internal/service` 等包作为可复用逻辑；这个分层思维从 Day01 就开始。
+
+### F. 代码示例（最小可运行）
+文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day01_01_packages_import/main.go`
+```go
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+func main() {
+	fmt.Println("== Day01.1: package/import + exported names ==") // Output: == Day01.1: package/import + exported names ==
+
+	s := "go fullstack"
+	fmt.Printf("ToUpper(%q)=%q\n", s, strings.ToUpper(s)) // Output: ToUpper("go fullstack")="GO FULLSTACK"
+
+	// In Go: identifiers starting with Uppercase are exported (public).
+	// identifiers starting with lowercase are unexported (package-private).
+}
+```
+
+### G. 怎么运行（命令 + 预期现象）
 ```bash
 go run ./cmd/day01_01_packages_import
+# Output: == Day01.1: package/import + exported names ==
+# Output: ToUpper("go fullstack")="GO FULLSTACK"
 ```
 
-代码（全文）见：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day01_01_packages_import/main.go:1`
+### H. 练习题（1–3 题）
+练习 1：故意加一个没用到的 import（比如 `math`），观察编译错误  
+- 验收标准：你能看到编译器明确提示 “imported and not used”
 
-### 2.2 var + zero values
-运行：
+### I. 参考答案（紧跟每道练习题）
+参考答案 1（可运行做法）：  
+在 `main.go` 里加 `import "math"` 且不使用，然后运行：
 ```bash
-go run ./cmd/day01_02_vars_zero
+go run ./cmd/day01_01_packages_import
+# Output: ... imported and not used: "math" (输出可能变化/不固定：报错细节随 Go 版本变化)
 ```
-代码（全文）见：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day01_02_vars_zero/main.go:1`
-
-### 2.3 := short declaration
-运行：
-```bash
-go run ./cmd/day01_03_short_decl
-```
-代码（全文）见：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day01_03_short_decl/main.go:1`
-
-### 2.4 conversions + const
-运行：
-```bash
-go run ./cmd/day01_04_conversions_const
-```
-代码（全文）见：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day01_04_conversions_const/main.go:1`
-
-### 2.5 functions + (value, error)
-运行：
-```bash
-go run ./cmd/day01_05_functions_error
-```
-代码（全文）见：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day01_05_functions_error/main.go:1`
-
-### 2.6 if / for / switch
-运行：
-```bash
-go run ./cmd/day01_06_if_for_switch
-```
-代码（全文）见：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day01_06_if_for_switch/main.go:1`
-
-### 2.7 slices/maps + nil/empty + map order
-运行：
-```bash
-go run ./cmd/day01_07_slices_maps
-```
-代码（全文）见：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day01_07_slices_maps/main.go:1`
 
 ---
 
-## 3) 常见坑（结合 TS/Node 习惯对照）
-- `{` 不能另起一行（Go 会自动插分号，容易编译报错）。
-- 未使用的 import/变量会直接报错（不是“严格模式”，是 Go 的工程约束）。
-- `:=` 只能在函数内；并且在 `if/for` 里容易造成 **shadowing**（变量遮蔽）。
-- `int`/`int64` 不会自动转换；别指望像 JS 一样“都能算”。
-- `slice` 可能共享底层数组：子切片改元素会影响原切片。
-- `nil map` 写入会 panic，必须 `make`。
-- `map` 遍历顺序不稳定：输出/逻辑不要依赖顺序（如需顺序，取 key 排序再遍历）。
+## 知识点 2：变量声明 + 零值（Zero Value）+ `:=`（短变量声明）
 
-## 4) 工程用法/最佳实践（真实 API 项目怎么落地）
-- 写完就 `gofmt`（后面建议 IDE 开保存自动格式化）。
-- 代码组织从 “`cmd/` 入口 + `internal/` 业务包” 开始，后续接 HTTP/MySQL 会更顺。
-- 错误处理先把模式练熟：`v, err := ...; if err != nil { return ... }`。
-- 用 `nil` 表达“未初始化/缺省”，但对外 API（尤其 JSON）要明确 `null` vs `[]` 的契约。
+### B. 一句话定义
+Go 里“声明即初始化为零值”，函数体内常用 `:=` 做“声明+赋值+类型推导”。
 
-## 5) 练习策略（练习可直接作为“运用示例”，提供完整参考实现）
-完整参考实现就是本笔记对应的 7 个可运行示例（直接跑即可）：
-- `go run ./cmd/day01_01_packages_import`
-- `go run ./cmd/day01_02_vars_zero`
-- `go run ./cmd/day01_03_short_decl`
-- `go run ./cmd/day01_04_conversions_const`
-- `go run ./cmd/day01_05_functions_error`
-- `go run ./cmd/day01_06_if_for_switch`
-- `go run ./cmd/day01_07_slices_maps`
+### C. 为什么重要（不做会怎样）
+你后面写 handler/service 时会大量用到“零值 + 显式错误处理”；如果你把零值当成“未定义”，就会把 bug 带到线上（例如把 `0` 当成“未传”）。
 
-你可以做 3 个“就地改造”（不新增文件也行）：
-1) 在 Day01.5 增加一个新的错误分支（比如输入负数），并保持输出注释规则。
-2) 在 Day01.7 里把 `copy` 去掉，观察 `s3` 修改是否影响 `s2`，写下你的结论。
-3) 在 map 遍历前先把 keys 拿出来排序（`sort.Strings`），让输出顺序固定。
+### D. 重难点拆解（2–4 条）
+1) **没有 `undefined`**：只有“零值/非零值”，需要你明确“零值是否是合法业务值”。  
+2) **`:=` 只能在函数体内**：包级别必须用 `var`。  
+3) **指针零值是 `nil`**：这是你区分“缺失/未初始化”的关键手段（后面 JSON PATCH 会用）。
+
+### E. 业务场景落地
+例如“分页 page/size”里 `0` 通常不是合法值；你要显式校验，而不是指望“未传就是 0 然后自动变成默认值”。
+
+### F. 代码示例（最小可运行）
+文件 1：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day01_02_vars_zero/main.go`
+```go
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("== Day01.2: var + zero values ==") // Output: == Day01.2: var + zero values ==
+
+	var count int
+	var name string
+	var ok bool
+	fmt.Printf("count=%d name=%q ok=%v\n", count, name, ok) // Output: count=0 name="" ok=false
+
+	var p *int
+	fmt.Printf("p==nil? %v\n", p == nil) // Output: p==nil? true
+}
+```
+
+文件 2：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day01_03_short_decl/main.go`
+```go
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("== Day01.3: := short declaration ==") // Output: == Day01.3: := short declaration ==
+
+	x := 42
+	fmt.Printf("x=%d type=%T\n", x, x) // Output: x=42 type=int
+
+	// := is function-scope only; package-level must use var.
+}
+```
+
+### G. 怎么运行（命令 + 预期现象）
+```bash
+go run ./cmd/day01_02_vars_zero
+# Output: == Day01.2: var + zero values ==
+# Output: count=0 name="" ok=false
+# Output: p==nil? true
+
+go run ./cmd/day01_03_short_decl
+# Output: == Day01.3: := short declaration ==
+# Output: x=42 type=int
+```
+
+### H. 练习题（1–3 题）
+练习 1：把 `var p *int` 改成 `p := new(int)` 并打印 `*p`  
+- 验收标准：你能看到 `*p` 的典型输出是 `0`（因为 int 的零值是 0）
+
+### I. 参考答案
+参考答案 1（可运行做法）：  
+在 `day01_02_vars_zero/main.go` 里加：
+```go
+p := new(int)
+fmt.Printf("*p=%d\n", *p) // Output: *p=0
+```
+然后运行 `go run ./cmd/day01_02_vars_zero`。
+
+---
+
+## 知识点 3：显式类型转换 + `const` + `(value, error)`（工程里最常见的失败建模）
+
+### B. 一句话定义
+Go 不做隐式数值转换；函数失败通常用 `(value, error)` 表达，调用点显式检查 `err`。
+
+### C. 为什么重要（不做会怎样）
+后台管理 API 的每一层（handler/service/repo）都会返回错误；如果你用“随便 panic/忽略 err”，系统会变得不可控、不可定位、不可交付。
+
+### D. 重难点拆解（2–4 条）
+1) **显式转换**：`int`/`int64` 不会自动转换，避免精度/溢出悄悄发生。  
+2) **`const` 是编译期常量**：常用来表达稳定配置/枚举值（后面错误码会用）。  
+3) **错误是值**：`ErrXxx`（sentinel error）+ `errors.Is` 是最小可复用模式。
+
+### E. 业务场景落地
+例如“创建用户”如果 email 重复，你会返回一个可匹配的错误语义（后面映射成 HTTP 409），而不是靠字符串判断。
+
+### F. 代码示例（最小可运行）
+文件 1：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day01_04_conversions_const/main.go`
+```go
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("== Day01.4: explicit conversions + const ==") // Output: == Day01.4: explicit conversions + const ==
+
+	x := 42
+	var big int64 = 1
+	sum := int64(x) + big
+	fmt.Printf("int64(x)+big=%d type=%T\n", sum, sum) // Output: int64(x)+big=43 type=int64
+
+	const pi = 3.14159
+	fmt.Printf("pi=%.2f type=%T\n", pi, pi) // Output: pi=3.14 type=float64
+}
+```
+
+文件 2：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day01_05_functions_error/main.go`
+```go
+package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+func main() {
+	fmt.Println("== Day01.5: functions + (value, error) ==") // Output: == Day01.5: functions + (value, error) ==
+
+	v, err := divide(10, 2)
+	fmt.Printf("divide(10,2) => v=%d err=%v\n", v, err) // Output: divide(10,2) => v=5 err=<nil>
+
+	_, err = divide(10, 0)
+	fmt.Printf("divide(10,0) => err=%v\n", err) // Output: divide(10,0) => err=divide by zero
+
+	fmt.Printf("errors.Is(err, ErrDivideByZero)=%v\n", errors.Is(err, ErrDivideByZero)) // Output: errors.Is(err, ErrDivideByZero)=true
+}
+
+var ErrDivideByZero = errors.New("divide by zero")
+
+func divide(a, b int) (int, error) {
+	if b == 0 {
+		return 0, ErrDivideByZero
+	}
+	return a / b, nil
+}
+```
+
+### G. 怎么运行（命令 + 预期现象）
+```bash
+go run ./cmd/day01_04_conversions_const
+# Output: == Day01.4: explicit conversions + const ==
+# Output: int64(x)+big=43 type=int64
+# Output: pi=3.14 type=float64
+
+go run ./cmd/day01_05_functions_error
+# Output: == Day01.5: functions + (value, error) ==
+# Output: divide(10,2) => v=5 err=<nil>
+# Output: divide(10,0) => err=divide by zero
+# Output: errors.Is(err, ErrDivideByZero)=true
+```
+
+### H. 练习题（1–3 题）
+练习 1：给 `divide` 增加一个分支：`a < 0 || b < 0` 返回新错误 `ErrNegativeNotAllowed`  
+- 验收标准：你能用 `errors.Is(err, ErrNegativeNotAllowed)` 匹配到它
+
+练习 2：跑一遍控制流与集合例子，写下“map 顺序为什么不稳定”  
+- 验收标准：你能观察到 `day01_07_slices_maps` 的遍历输出行有“输出可能变化/不固定”标注
+
+### I. 参考答案
+参考答案 1（可运行做法）：  
+按练习描述新增：
+```go
+var ErrNegativeNotAllowed = errors.New("negative not allowed")
+```
+并在 `divide` 里判断返回；再在 `main()` 增加一次调用并打印 `errors.Is`（打印需按输出注释规则）。
+
+参考答案 2（可运行做法）：  
+运行：
+```bash
+go run ./cmd/day01_07_slices_maps
+# Output: ... iter: a=1 b=2 c=3 ... (输出可能变化/不固定：map 迭代顺序由运行时随机化)
+```
+
+---
 
 ## References
-- 官方：https://go.dev/doc/ （Go 官方文档入口）
-- 官方：https://go.dev/ref/spec （Go 语言规范：语法与分号插入规则等）
-- 官方：https://go.dev/blog/defer-panic-and-recover （defer/panic/recover 的工作机制）
-- 官方：https://pkg.go.dev/encoding/json （JSON 编码行为：slice 的 null/[] 等）
-- 官方：https://pkg.go.dev/builtin （make/len/cap 等内建函数语义）
+- 官方：Go 文档入口 https://go.dev/doc/
+- 官方：Go Spec（含分号插入）https://go.dev/ref/spec
+- 官方：builtin（make/len/cap）https://pkg.go.dev/builtin
+- 官方：encoding/json（nil slice vs empty slice）https://pkg.go.dev/encoding/json
