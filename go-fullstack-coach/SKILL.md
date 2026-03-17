@@ -80,6 +80,12 @@ flowchart TD
 2) 完整性检查：缺少 why / runnable / pitfalls / 工程落地 / 验证方式 → 再上网补齐
 3) 冲突：以官方为准，并在笔记里写“NotebookLM vs Official”
 
+## 领域最佳实践（跨 skill 参考）
+当学习/实现内容涉及下面领域时，把对应 skill 当作“规范与最佳实践参考”（不替代 NotebookLM / 官方文档，只做补充与约束）：
+- 后端 API 设计：参考 `api-design-principles`
+- 前端页面/交互/UI：参考 `frontend-design`
+- 数据库表结构/索引/约束：参考 `postgresql-table-design`
+
 ## 笔记与外部记忆（防 token 爆炸）
 - 当天笔记：`notes/go/day<NN>-<topic-slug>.md`
 - 课前必读：`notes/go/progress.md`、`notes/go/glossary.md`、`notes/go/patterns.md`、`notes/go/pitfalls.md`
