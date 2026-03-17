@@ -105,7 +105,7 @@ curl -s "http://localhost:18080/api/v1/not-exist"
 - 验收标准：停掉 MySQL 容器后再 curl，返回 500 + `DB_ERROR`
 
 ### I. 参考答案
-参考答案 1：在 handler 里 `strings.TrimSpace(search)` 后判断 `len(search) > 50`，直接 `writeError(400,10002,"INVALID_QUERY")`。
+参考答案 1：在 handler 里 `strings.TrimSpace(search)` 后判断 `len(search) > 50`，直接 `httpkit.WriteError(400,10002,"INVALID_QUERY")`（或你的同名封装）。
 
 参考答案 2：
 ```bash
@@ -124,4 +124,3 @@ curl -s "http://localhost:18080/api/v1/users?page=1&size=2"
 - 官方：Go `database/sql` https://pkg.go.dev/database/sql （官方）
 - 驱动：go-sql-driver/mysql https://pkg.go.dev/github.com/go-sql-driver/mysql （官方/准官方）
 - 规范参考：`api-design-principles`（资源命名、方法语义、分页参数、错误响应一致性）
-

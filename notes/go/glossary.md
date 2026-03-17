@@ -79,3 +79,7 @@
 ## Embedding（匿名嵌入/组合）
 - 把一个类型匿名放进 struct：`type X struct { Y }`，Y 的方法会被提升（promoted）。
 - 常用于装饰器：`type LoggingRepo struct{ Repo }`，在不改业务逻辑的情况下加 log/metrics。
+
+## internal 包（internal/）
+- `internal/` 下的包只能被“同一个 module 内部”导入，避免被外部项目误用。
+- 工程上常用来放：可复用但不想对外承诺稳定 API 的实现细节（例如 `internal/httpkit`）。

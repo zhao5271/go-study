@@ -13,8 +13,12 @@
 
 ## 统一 JSON 响应（最小版）
 - 约定统一响应结构：`{code, message, data}`
-- `writeJSON(w, status, v)`：只做 Content-Type + status + encode
-- `writeError(w, status, code, message)`：错误码与 HTTP status 分离，便于前端稳定处理
+- `httpkit.WriteJSON(w, status, v)`：只做 Content-Type + status + encode
+- `httpkit.WriteError(w, status, code, message)`：错误码与 HTTP status 分离，便于前端稳定处理
+
+## 分页 query（最小版）
+- `page>=1`；`1<=size<=100`（统一边界）
+- `page,size,err := httpkit.ParsePageSize(r)`，失败就 400 + `INVALID_QUERY`
 
 ## DB 访问（最小版）
 - DSN 从 env 读取：`MYSQL_DSN`，本地用 compose 映射端口 3307，避免占用 3306。

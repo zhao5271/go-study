@@ -1,27 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"os"
+
+	"example.com/go-learning/internal/httpkit"
 )
-
-type APIResponse struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data,omitempty"`
-}
-
-func writeJSON(w http.ResponseWriter, status int, v interface{}) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(v) // Output: {"code":0,"message":"OK","data":{...}}\n
-}
-
-func writeError(w http.ResponseWriter, status int, code int, message string) {
-	writeJSON(w, status, APIResponse{Code: code, Message: message})
-}
 
 // Exercise 2 Answer:
 // - 统一 404 JSON：用 ServeMux.Handler 做一次“是否命中路由”的探测
@@ -29,7 +14,7 @@ func withJSONNotFound(mux *http.ServeMux) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h, pattern := mux.Handler(r)
 		if pattern == "" || h == nil {
-			writeError(w, http.StatusNotFound, 10004, "NOT_FOUND") // Output: {"code":10004,"message":"NOT_FOUND"}\n
+			httpkit.WriteError(w, http.StatusNotFound, 10004, "NOT_FOUND") // Output: {"code":10004,"message":"NOT_FOUND"}\n
 			return
 		}
 		h.ServeHTTP(w, r)
@@ -39,7 +24,7 @@ func withJSONNotFound(mux *http.ServeMux) http.Handler {
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/v1/health", func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, http.StatusOK, APIResponse{Code: 0, Message: "OK", Data: map[string]bool{"ok": true}}) // Output: {"code":0,"message":"OK","data":{"ok":true}}\n
+		httpkit.WriteJSON(w, http.StatusOK, httpkit.APIResponse{Code: 0, Message: "OK", Data: map[string]bool{"ok": true}}) // Output: {"code":0,"message":"OK","data":{"ok":true}}\n
 	})
 
 	port := os.Getenv("PORT")

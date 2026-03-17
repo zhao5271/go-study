@@ -62,6 +62,10 @@
 - `for _, v := range s` 的 `v` 是副本，改字段不会回写到切片元素。
 - 避免：用索引遍历 `for i := range s { s[i].Field = ... }` 或改成 `[]*T`。
 
+## HTTP 工具函数复制粘贴导致不一致
+- 同一个项目里出现多个 `writeJSON/writeError/parsePageSize` 版本，很容易某个接口漏校验/响应结构不同。
+- 避免：抽到 `internal/httpkit`，所有 handler 只调用这一份实现。
+
 ## nil interface 坑（看起来不是 nil）
 - `var repo UserRepo = (*MemoryUserRepo)(nil)`：`repo != nil` 但内部指针是 nil。
 - 避免：接口里存指针时要小心判空；必要时显式检查底层指针或避免返回“带类型的 nil”。

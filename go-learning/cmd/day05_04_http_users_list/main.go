@@ -3,24 +3,18 @@ package main
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-)
 
-type APIResponse struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data,omitempty"`
-}
+	"example.com/go-learning/internal/httpkit"
+)
 
 type User struct {
 	ID    int64  `json:"id"`
@@ -37,24 +31,13 @@ type ListUsersData struct {
 }
 
 var (
-	errInvalidQuery = errors.New("invalid query")
 	errDB           = errors.New("db error")
 )
-
-func writeJSON(w http.ResponseWriter, status int, v interface{}) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(v) // Output: {"code":0,"message":"OK","data":{...}}\n
-}
-
-func writeError(w http.ResponseWriter, status int, code int, message string) {
-	writeJSON(w, status, APIResponse{Code: code, Message: message})
-}
 
 func onlyGET(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
-			writeError(w, http.StatusMethodNotAllowed, 10001, "METHOD_NOT_ALLOWED") // Output: {"code":10001,"message":"METHOD_NOT_ALLOWED"}\n
+			httpkit.WriteError(w, http.StatusMethodNotAllowed, 10001, "METHOD_NOT_ALLOWED") // Output: {"code":10001,"message":"METHOD_NOT_ALLOWED"}\n
 			return
 		}
 		next(w, r)
@@ -65,33 +48,11 @@ func withJSONNotFound(mux *http.ServeMux) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		h, pattern := mux.Handler(r)
 		if pattern == "" || h == nil {
-			writeError(w, http.StatusNotFound, 10004, "NOT_FOUND") // Output: {"code":10004,"message":"NOT_FOUND"}\n
+			httpkit.WriteError(w, http.StatusNotFound, 10004, "NOT_FOUND") // Output: {"code":10004,"message":"NOT_FOUND"}\n
 			return
 		}
 		h.ServeHTTP(w, r)
 	})
-}
-
-func parsePageSize(r *http.Request) (page int, size int, err error) {
-	page = 1
-	size = 20
-
-	q := r.URL.Query()
-	if raw := strings.TrimSpace(q.Get("page")); raw != "" {
-		n, convErr := strconv.Atoi(raw)
-		if convErr != nil || n < 1 {
-			return 0, 0, errInvalidQuery
-		}
-		page = n
-	}
-	if raw := strings.TrimSpace(q.Get("size")); raw != "" {
-		n, convErr := strconv.Atoi(raw)
-		if convErr != nil || n < 1 || n > 100 {
-			return 0, 0, errInvalidQuery
-		}
-		size = n
-	}
-	return page, size, nil
 }
 
 func listUsers(ctx context.Context, db *sql.DB, page int, size int, search string) (items []User, total int, err error) {
@@ -146,13 +107,13 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/v1/health", onlyGET(func(w http.ResponseWriter, r *http.Request) {
-		writeJSON(w, http.StatusOK, APIResponse{Code: 0, Message: "OK", Data: map[string]bool{"ok": true}}) // Output: {"code":0,"message":"OK","data":{"ok":true}}\n
+		httpkit.WriteJSON(w, http.StatusOK, httpkit.APIResponse{Code: 0, Message: "OK", Data: map[string]bool{"ok": true}}) // Output: {"code":0,"message":"OK","data":{"ok":true}}\n
 	}))
 
 	mux.HandleFunc("/api/v1/users", onlyGET(func(w http.ResponseWriter, r *http.Request) {
-		page, size, err := parsePageSize(r)
+		page, size, err := httpkit.ParsePageSize(r)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, 10002, "INVALID_QUERY") // Output: {"code":10002,"message":"INVALID_QUERY"}\n
+			httpkit.WriteError(w, http.StatusBadRequest, 10002, "INVALID_QUERY") // Output: {"code":10002,"message":"INVALID_QUERY"}\n
 			return
 		}
 		search := r.URL.Query().Get("search")
@@ -163,15 +124,15 @@ func main() {
 		items, total, err := listUsers(ctx, db, page, size, search)
 		if err != nil {
 			if errors.Is(err, errDB) {
-				writeError(w, http.StatusInternalServerError, 20001, "DB_ERROR") // Output: {"code":20001,"message":"DB_ERROR"}\n
+				httpkit.WriteError(w, http.StatusInternalServerError, 20001, "DB_ERROR") // Output: {"code":20001,"message":"DB_ERROR"}\n
 				return
 			}
-			writeError(w, http.StatusInternalServerError, 20002, "INTERNAL_ERROR") // Output: {"code":20002,"message":"INTERNAL_ERROR"}\n
+			httpkit.WriteError(w, http.StatusInternalServerError, 20002, "INTERNAL_ERROR") // Output: {"code":20002,"message":"INTERNAL_ERROR"}\n
 			return
 		}
 
 		log.Printf("list_users page=%d size=%d search=%q total=%d", page, size, search, total) // Output: 2006/01/02 15:04:05 list_users page=1 size=2 search="a" total=2 (输出可能变化/不固定：包含时间戳/数据变化)
-		writeJSON(w, http.StatusOK, APIResponse{Code: 0, Message: "OK", Data: ListUsersData{Items: items, Page: page, Size: size, Total: total}}) // Output: {"code":0,"message":"OK","data":{"items":[...],"page":1,"size":2,"total":2}}\n
+		httpkit.WriteJSON(w, http.StatusOK, httpkit.APIResponse{Code: 0, Message: "OK", Data: ListUsersData{Items: items, Page: page, Size: size, Total: total}}) // Output: {"code":0,"message":"OK","data":{"items":[...],"page":1,"size":2,"total":2}}\n
 	}))
 
 	port := os.Getenv("PORT")
@@ -183,4 +144,3 @@ func main() {
 	err = http.ListenAndServe(addr, withJSONNotFound(mux))
 	log.Printf("server stopped: %v", err) // Output: 2006/01/02 15:04:05 server stopped: listen tcp :18080: bind: address already in use (输出可能变化/不固定：取决于环境与错误)
 }
-

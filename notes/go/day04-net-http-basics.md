@@ -54,6 +54,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -69,7 +70,11 @@ func main() {
 		_, _ = fmt.Fprintln(w, "ok") // Output: ok
 	})
 
-	addr := ":8080"
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	addr := ":" + port
 	log.Printf("listening on %s", addr) // Output: 2006/01/02 15:04:05 listening on :8080 (输出可能变化/不固定：包含时间戳)
 	err := http.ListenAndServe(addr, mux)
 	log.Printf("server stopped: %v", err) // Output: 2006/01/02 15:04:05 server stopped: listen tcp :8080: bind: address already in use (输出可能变化/不固定：取决于环境与错误)
@@ -77,15 +82,15 @@ func main() {
 ```
 
 ### G. 怎么运行（命令 + 预期现象）
-- 启动：`cd go-learning && go run ./cmd/day04_01a_http_mux`
+- 启动：`cd go-learning && PORT=18080 go run ./cmd/day04_01a_http_mux`
 - 预期现象：终端打印 listening；curl `/health` 返回 200 + `ok`
 
 ### H. 练习题（1–3 题，覆盖边界条件）
 
 #### 练习 1：把 `/health` 改成版本化路径 `/api/v1/health`
 - 验收标准：
-  - `curl -i http://localhost:8080/api/v1/health` 返回 200
-  - `curl -i http://localhost:8080/health` 返回 404（或被你重定向，但要解释）
+  - `curl -i http://localhost:18080/api/v1/health` 返回 200
+  - `curl -i http://localhost:18080/health` 返回 404（或被你重定向，但要解释）
 
 ### I. 参考答案（可运行）
 直接看下一个知识点的示例（知识点 2），它已经使用了 `/api/v1/health`。
@@ -130,19 +135,12 @@ func main() {
 package main
 
 import (
-	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
-	"strconv"
-	"strings"
-)
+	"os"
 
-type APIResponse struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data,omitempty"`
-}
+	"example.com/go-learning/internal/httpkit"
+)
 
 type User struct {
 	ID   int    `json:"id"`
@@ -155,40 +153,6 @@ type ListUsersData struct {
 	Page  int    `json:"page"`
 	Size  int    `json:"size"`
 	Total int    `json:"total"`
-}
-
-var errBadQuery = errors.New("bad query")
-
-func writeJSON(w http.ResponseWriter, status int, v interface{}) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(v) // Output: {"code":0,"message":"OK","data":{...}}\n
-}
-
-func writeError(w http.ResponseWriter, status int, code int, message string) {
-	writeJSON(w, status, APIResponse{Code: code, Message: message})
-}
-
-func parsePageSize(r *http.Request) (page int, size int, err error) {
-	page = 1
-	size = 20
-
-	q := r.URL.Query()
-	if raw := strings.TrimSpace(q.Get("page")); raw != "" {
-		n, convErr := strconv.Atoi(raw)
-		if convErr != nil || n < 1 {
-			return 0, 0, errBadQuery
-		}
-		page = n
-	}
-	if raw := strings.TrimSpace(q.Get("size")); raw != "" {
-		n, convErr := strconv.Atoi(raw)
-		if convErr != nil || n < 1 || n > 100 {
-			return 0, 0, errBadQuery
-		}
-		size = n
-	}
-	return page, size, nil
 }
 
 func main() {
@@ -204,21 +168,21 @@ func main() {
 	// 真实项目里建议统一加 /api/v1 做版本前缀，避免未来破坏性变更无处安放。
 	mux.HandleFunc("/api/v1/health", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
-			writeError(w, http.StatusMethodNotAllowed, 10001, "METHOD_NOT_ALLOWED") // Output: {"code":10001,"message":"METHOD_NOT_ALLOWED"}\n
+			httpkit.WriteError(w, http.StatusMethodNotAllowed, 10001, "METHOD_NOT_ALLOWED") // Output: {"code":10001,"message":"METHOD_NOT_ALLOWED"}\n
 			return
 		}
-		writeJSON(w, http.StatusOK, APIResponse{Code: 0, Message: "OK", Data: map[string]bool{"ok": true}}) // Output: {"code":0,"message":"OK","data":{"ok":true}}\n
+		httpkit.WriteJSON(w, http.StatusOK, httpkit.APIResponse{Code: 0, Message: "OK", Data: map[string]bool{"ok": true}}) // Output: {"code":0,"message":"OK","data":{"ok":true}}\n
 	})
 
 	mux.HandleFunc("/api/v1/users", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
-			writeError(w, http.StatusMethodNotAllowed, 10001, "METHOD_NOT_ALLOWED") // Output: {"code":10001,"message":"METHOD_NOT_ALLOWED"}\n
+			httpkit.WriteError(w, http.StatusMethodNotAllowed, 10001, "METHOD_NOT_ALLOWED") // Output: {"code":10001,"message":"METHOD_NOT_ALLOWED"}\n
 			return
 		}
 
-		page, size, err := parsePageSize(r)
+		page, size, err := httpkit.ParsePageSize(r)
 		if err != nil {
-			writeError(w, http.StatusBadRequest, 10002, "INVALID_QUERY") // Output: {"code":10002,"message":"INVALID_QUERY"}\n
+			httpkit.WriteError(w, http.StatusBadRequest, 10002, "INVALID_QUERY") // Output: {"code":10002,"message":"INVALID_QUERY"}\n
 			return
 		}
 
@@ -239,10 +203,14 @@ func main() {
 			Size:  size,
 			Total: total,
 		}
-		writeJSON(w, http.StatusOK, APIResponse{Code: 0, Message: "OK", Data: data}) // Output: {"code":0,"message":"OK","data":{"items":[...],"page":1,"size":2,"total":4}}\n
+		httpkit.WriteJSON(w, http.StatusOK, httpkit.APIResponse{Code: 0, Message: "OK", Data: data}) // Output: {"code":0,"message":"OK","data":{"items":[...],"page":1,"size":2,"total":4}}\n
 	})
 
-	addr := ":8080"
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	addr := ":" + port
 	log.Printf("listening on %s", addr) // Output: 2006/01/02 15:04:05 listening on :8080 (输出可能变化/不固定：包含时间戳)
 	err := http.ListenAndServe(addr, mux)
 	log.Printf("server stopped: %v", err) // Output: 2006/01/02 15:04:05 server stopped: listen tcp :8080: bind: address already in use (输出可能变化/不固定：取决于环境与错误)
@@ -250,7 +218,7 @@ func main() {
 ```
 
 ### G. 怎么运行（命令 + 预期现象）
-- 启动：`cd go-learning && go run ./cmd/day04_01b_json_errors`
+- 启动：`cd go-learning && PORT=18080 go run ./cmd/day04_01b_json_errors`
 - 预期现象：`curl` `/api/v1/health` 返回统一 JSON；`/api/v1/users` 支持分页，非法参数返回 400 + 业务码。
 
 ### H. 练习题（1–3 题，覆盖边界条件）
