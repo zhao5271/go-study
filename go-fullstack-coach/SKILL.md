@@ -102,7 +102,28 @@ If any web fallback was used for the step:
 - In Markdown notes, add `## References` at the end:
   - Each item: URL + 1-line why it was used, mark as `官方` or `社区`
 
-## 4.2) Optional: Convert Notes to Web Page (only on request)
+## 4.2) External Memory Protocol (mandatory)
+To prevent chat context/token explosion, keep long-term memory in files under `notes/go/` and keep chat context minimal.
+
+### Always-read index files (start of each session/lesson)
+- `notes/go/progress.md` (current state + completed days + next steps)
+- `notes/go/glossary.md` (terms)
+- `notes/go/patterns.md` (engineering patterns)
+- `notes/go/pitfalls.md` (pitfalls)
+
+### Always-update index files (end of each lesson)
+After finishing a step/day:
+1. Append a concise entry to `notes/go/progress.md` (what was done + artifact paths + next step).
+2. Add/adjust only truly reusable items in:
+   - `notes/go/glossary.md` (new terms, 3–8 lines each)
+   - `notes/go/patterns.md` (reusable engineering templates)
+   - `notes/go/pitfalls.md` (pitfalls + avoidance)
+3. Do not paste huge code into the chat history if it already exists in files; reference paths instead.
+
+### Context Pack (for starting a new chat thread)
+Maintain `notes/go/context-pack.md` as the canonical “new thread” prompt. When the user says the conversation is too long, instruct them to start a new thread and paste that file content.
+
+## 4.3) Optional: Convert Notes to Web Page (only on request)
 If the user explicitly asks for a web page version, then use `knowledge-2-web` to convert notes:
 - Content JSON: `knowledge-content/day<NN>-<topic-slug>.json`
 - HTML output: `output/knowledge-web/<title>.html`
