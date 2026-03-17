@@ -53,3 +53,11 @@
 ## DSN 忘记 parseTime
 - 扫描 `DATETIME/TIMESTAMP` 到 `time.Time` 可能失败或行为异常。
 - 避免：MySQL DSN 加 `parseTime=true`。
+
+## 值接收者“改了不生效”
+- `struct` 是按值拷贝；值接收者方法修改的是副本。
+- 避免：需要修改接收者时用指针接收者 `func (t *T) ...`；或返回新值并显式赋回。
+
+## range 遍历 `[]struct` 修改不生效
+- `for _, v := range s` 的 `v` 是副本，改字段不会回写到切片元素。
+- 避免：用索引遍历 `for i := range s { s[i].Field = ... }` 或改成 `[]*T`。

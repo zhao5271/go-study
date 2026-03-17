@@ -4,8 +4,8 @@
 
 ## 当前状态
 - 目标：从 Vue3/TypeScript/Node 转 Go 全栈（通用 API + MySQL）
-- 教学规则：每次输出严格 1)~5) 结构；示例代码 `fmt.Print*` 必须同行写典型输出注释；NotebookLM 优先，不足再上网补齐并写 References；不自动转 HTML；`go test` 暂不强制
-- 进行中：Day 03（struct / 方法 / 接口）— 已完成 Day 03.1（见 `notes/go/day03-struct-methods-basics.md`）
+- 教学规则（当前）：每次回复只讲 1–3 个知识点；每个知识点按 A–I 模板输出；所有输出点必须标注典型输出/不确定性原因；NotebookLM 优先，不足再上网补齐并写 References；不自动转 HTML；`go test` 非强制（你要求才跑）
+- 当前进度：已完成 Day 05.2（MySQL + 列表 API + 错误码草案），准备进入 Day 06（Gin 工程化落地）
 
 ## 已完成
 | Day | 主题 | 产物 | 复习要点 |

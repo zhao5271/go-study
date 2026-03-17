@@ -21,6 +21,10 @@
 - 所有 DB 操作必须带 `context.WithTimeout`（先从 2–3 秒开始）。
 - 列表分页最小模板：`COUNT(*)` + `LIMIT/OFFSET`（先跑通，再谈性能优化）。
 
+## 服务启动端口（约定）
+- 所有可运行 HTTP 示例优先支持 `PORT` env，避免端口占用冲突。
+- 默认值建议选 `18080`（本仓库示例已沿用）。
+
 ## Table-driven tests 模板
 ```go
 tests := []struct {
