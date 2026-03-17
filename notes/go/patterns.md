@@ -11,6 +11,11 @@
 - handler 只负责：解析输入 → 调 service → 把 error 映射成 HTTP 响应。
 - 内部逻辑不要直接写响应；统一返回 error，在入口层转换。
 
+## 统一 JSON 响应（最小版）
+- 约定统一响应结构：`{code, message, data}`
+- `writeJSON(w, status, v)`：只做 Content-Type + status + encode
+- `writeError(w, status, code, message)`：错误码与 HTTP status 分离，便于前端稳定处理
+
 ## Table-driven tests 模板
 ```go
 tests := []struct {
@@ -34,4 +39,3 @@ for _, tt := range tests {
 - `go-learning/cmd/dayNN_*`：每个知识点一个可运行入口
 - `go-learning/internal/...`：可复用逻辑 + 可测试
 - 笔记：`notes/go/dayNN-*.md` + 索引文件（progress/glossary/patterns/pitfalls）
-

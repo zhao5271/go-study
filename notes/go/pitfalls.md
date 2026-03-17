@@ -38,3 +38,10 @@
 - recover 只能在 defer 中、且只对当前 goroutine。
 - 避免：不要把 recover 当通用异常处理；仅用于边界兜底。
 
+## HTTP 响应：写了 body 就别再改 header/status
+- `WriteHeader` 只能写一次；一旦写了 body，header/status 可能已经发出。
+- 避免：先校验参数与权限；确定 status 后一次性写出 JSON。
+
+## 405/404 结构不一致
+- 成功是 JSON，失败却是纯文本/HTML，前端会被迫写分支。
+- 避免：统一 `writeError`，尽早建立错误码与响应结构规范。

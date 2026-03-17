@@ -45,3 +45,11 @@
 - nil slice JSON 通常是 `null`；empty slice JSON 是 `[]`（取决于编码场景与类型）。
 - nil map 不能写入（会 panic），必须 `make(map[K]V)`。
 
+## net/http Handler / ServeMux
+- `http.Handler`：处理一次 HTTP 请求的抽象（有 `ServeHTTP(w, r)` 方法）。
+- `http.HandlerFunc`：函数适配器，让普通函数也能当 Handler。
+- `http.ServeMux`：最基础的路由分发器（按路径匹配把请求交给不同 Handler）。
+
+## HTTP Status Code vs 业务错误码
+- HTTP status：协议层语义（400/401/403/404/405/500…），便于网关/监控/客户端通用处理。
+- 业务 code：业务层原因（如参数非法、鉴权失败、资源不存在），便于前端提示、埋点、告警聚合。
