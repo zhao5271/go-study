@@ -25,6 +25,11 @@
 - 所有可运行 HTTP 示例优先支持 `PORT` env，避免端口占用冲突。
 - 默认值建议选 `18080`（本仓库示例已沿用）。
 
+## Repo/Service 分层（最小版）
+- service 持有接口：`type Service struct { repo Repo }`，通过构造函数注入：`NewService(repo Repo)`.
+- repo 接口尽量表达业务语义（如 `ListUsers`），不要暴露 SQL/驱动细节。
+- 横切能力（log/metrics）优先用装饰器：`type LoggingRepo struct { Repo }`。
+
 ## Table-driven tests 模板
 ```go
 tests := []struct {

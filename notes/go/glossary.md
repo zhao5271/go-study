@@ -71,3 +71,11 @@
 ## `omitempty`（JSON tag）
 - `json:"field,omitempty"`：当字段是“空值”时序列化会省略该字段（具体空值语义随类型不同）。
 - 常见用法：指针字段为 `nil` 时省略，用于表达 PATCH 的 optional 字段“没传”。
+
+## Interface（接口）
+- 接口是一组方法的契约；谁的方法集合匹配，谁就实现（隐式实现）。
+- 工程上常用于分层边界：service 依赖 repo 接口，repo 可替换（内存/MySQL/mock）。
+
+## Embedding（匿名嵌入/组合）
+- 把一个类型匿名放进 struct：`type X struct { Y }`，Y 的方法会被提升（promoted）。
+- 常用于装饰器：`type LoggingRepo struct{ Repo }`，在不改业务逻辑的情况下加 log/metrics。
