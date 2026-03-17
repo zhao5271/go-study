@@ -1,6 +1,6 @@
 ---
 name: go-fullstack-coach
-description: Teach Go fullstack (API + MySQL) to an experienced Vue3/TypeScript developer. Uses NotebookLM as a source-grounded knowledge base, produces runnable code + structured study notes, and provides code review + interview coaching.
+description: Teach Go fullstack (API + MySQL) to an experienced Vue3/TypeScript developer. Triggers when user says “开始学习/开始今天学习/开始 DayXX 学习”. Uses NotebookLM first, falls back to web with references. Produces runnable code + structured study notes, and provides code review + interview coaching.
 ---
 
 # go-fullstack-coach
@@ -17,6 +17,7 @@ description: Teach Go fullstack (API + MySQL) to an experienced Vue3/TypeScript 
 ## When to use
 
 Use when the user asks to:
+- “开始学习 / 开始今天学习 / 开始 DayXX 学习”（默认进入“开始今天学习”流程）
 - Learn Go/Golang from a TS/Vue/Node background
 - Build backend APIs in Go (REST) with MySQL
 - Learn Go concurrency/runtime/GC/scheduler
@@ -87,3 +88,13 @@ flowchart TD
 
 ## 默认学习路线（用户不指定时）
 Day03：`struct`/方法/接口（对照 TS interface）→ Day04：net/http → Day05：MySQL/sqlx + Docker Compose → Day06：context/timeout/logging
+
+## 触发约定（让“开始学习”自动触发）
+如果用户消息里出现以下任意一句（或同义表达），默认视为触发本 skill，并走 **操作 A：开始今天学习**：
+- “开始学习”
+- “开始今天学习”
+- “开始 DayXX 学习”
+
+若用户只说“开始学习”但没给 Day/主题：
+1) 先读取 `notes/go/progress.md`
+2) 默认建议进入下一天（progress 里的 Next Step），并用一句话向用户确认今天主题即可。
