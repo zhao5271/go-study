@@ -114,6 +114,10 @@ flowchart TD
 - 课后必更：progress +（必要时）补 glossary/patterns/pitfalls
 - 只要用了 web fallback：笔记末尾加 `## References`（官方/社区 + 用途）
 
+## Git 提交规范
+- **commit message 一律使用中文**（从现在开始；不回改历史提交）。
+- 建议格式：`学习：...` / `笔记：...` / `技能：...` / `杂项：...`（按实际内容选 1 个前缀即可）。
+
 ## 默认学习路线（用户不指定时）
 Day01：语法地基 → Day02：错误处理 → Day03：struct/接口（按需穿插）→ Day04：net/http → Day05：Gin 工程化 → Day06：MySQL + Docker Compose → Day07：超时/取消/优雅退出/日志
 
