@@ -45,3 +45,11 @@
 ## 405/404 结构不一致
 - 成功是 JSON，失败却是纯文本/HTML，前端会被迫写分支。
 - 避免：统一 `writeError`，尽早建立错误码与响应结构规范。
+
+## MySQL init.sql 不会每次都执行
+- Docker MySQL 的 `/docker-entrypoint-initdb.d` 只在“首次创建数据卷”时执行。
+- 避免：改了 init.sql 后要 `docker compose down -v` 清卷再启动（注意会丢数据）。
+
+## DSN 忘记 parseTime
+- 扫描 `DATETIME/TIMESTAMP` 到 `time.Time` 可能失败或行为异常。
+- 避免：MySQL DSN 加 `parseTime=true`。

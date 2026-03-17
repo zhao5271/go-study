@@ -53,3 +53,12 @@
 ## HTTP Status Code vs 业务错误码
 - HTTP status：协议层语义（400/401/403/404/405/500…），便于网关/监控/客户端通用处理。
 - 业务 code：业务层原因（如参数非法、鉴权失败、资源不存在），便于前端提示、埋点、告警聚合。
+
+## DSN（MySQL 连接串）
+- 连接数据库的字符串（用户名/密码/地址/库名/参数）。
+- 本仓库示例：`app:app@tcp(127.0.0.1:3307)/go_admin?parseTime=true`（3307 是 compose 映射端口）。
+- `parseTime=true`：让 `DATETIME/TIMESTAMP` 能正确扫描到 `time.Time`。
+
+## Transaction（事务）
+- 多步写入要么全成功，要么全失败；失败要回滚。
+- 常见场景：创建用户 + 写审计日志，必须保证一致性。

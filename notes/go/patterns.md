@@ -16,6 +16,11 @@
 - `writeJSON(w, status, v)`：只做 Content-Type + status + encode
 - `writeError(w, status, code, message)`：错误码与 HTTP status 分离，便于前端稳定处理
 
+## DB 访问（最小版）
+- DSN 从 env 读取：`MYSQL_DSN`，本地用 compose 映射端口 3307，避免占用 3306。
+- 所有 DB 操作必须带 `context.WithTimeout`（先从 2–3 秒开始）。
+- 列表分页最小模板：`COUNT(*)` + `LIMIT/OFFSET`（先跑通，再谈性能优化）。
+
 ## Table-driven tests 模板
 ```go
 tests := []struct {
