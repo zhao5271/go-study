@@ -14,6 +14,15 @@ description: Teach Go fullstack (API + MySQL) to an experienced Vue3/TypeScript 
 3) 产出：可运行代码 + 当天笔记（`notes/go/dayNN-*.md`）
 4) 课后更新索引（progress/glossary/patterns/pitfalls），必要时补 `## References`
 
+### 外部记忆更新（强制）
+**只要你生成/更新了任意笔记（`notes/go/day*.md`），就必须同步更新本地外部记忆文件**（哪怕只改了 1 行笔记也一样）：
+- `notes/go/progress.md`：更新“已完成/进行中/下一步”
+- `notes/go/glossary.md`：新增本次出现的新术语（每条 3–8 行）
+- `notes/go/patterns.md`：沉淀可复用模板（HTTP/DB/错误码/事务等）
+- `notes/go/pitfalls.md`：记录本次踩坑与规避方法（1–3 行/条）
+
+若本次学习没有新增术语/模式/坑点，也要在回复里明确写一句“外部记忆已检查，无需新增”。
+
 ## When to use
 
 Use when the user asks to:
