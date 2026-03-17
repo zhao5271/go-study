@@ -1,0 +1,86 @@
+{
+  "title": "Go 语法基础：变量与零值（Lesson 01.1）",
+  "subtitle": "面向 Vue3 / TypeScript / Node 工程师的 Go 全栈入门第一步",
+  "coreThesis": "把 Go 的“零值 + 静态强类型 + 显式转换/显式错误”思维切过来，后面写 API（HTTP + MySQL）才稳、才可维护。",
+  "primaryColor": "#0F4C81",
+  "accentColor": "#38BDF8",
+  "causes": [
+    {
+      "title": "零值（Zero Value）取代 undefined",
+      "description": "Go 变量声明后立即可用：数值=0、字符串=\"\"、布尔=false、引用类型=nil。用确定性降低“没初始化就用”的工程风险（对比 TS/JS 常见 undefined/null 坑）。"
+    },
+    {
+      "title": "短变量声明 := 提升局部可读性",
+      "description": "只在函数内使用，语法更短、类型推导更顺手；但依然是静态强类型，不是 JS 运行期随意变类型。"
+    },
+    {
+      "title": "不做隐式类型转换（更早暴露问题）",
+      "description": "int 不能直接加 int64，需要显式转换。用“多写一点转换”换取更可控的精度/溢出边界，把问题前置到编译期。"
+    },
+    {
+      "title": "编译期严格约束（未使用即报错）",
+      "description": "未使用的变量/导入会直接编译失败。取舍是更严格，但换来更干净的依赖与更少的“死代码/脏 import”。"
+    }
+  ],
+  "timeline": [
+    {
+      "time": "1.1",
+      "title": "var 声明 + 零值（Zero Value）",
+      "description": "<p class=\"text-gray-600 mt-2\">目标：建立“声明即初始化”的心智模型，告别 undefined。</p><pre class=\"mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs\"><code>package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"== 01.1A var + zero values ==\") // Output: == 01.1A var + zero values ==\n\n    var count int\n    var name string\n    var ok bool\n    fmt.Printf(\"count=%d name=%q ok=%v\\n\", count, name, ok) // Output: count=0 name=\"\" ok=false\n}\n</code></pre><p class=\"mt-2 text-xs text-gray-500\">运行：<code>cd /Users/zhang/Desktop/go-study/codex/go-learning</code> 然后 <code>go run ./cmd/lesson01_01a_var_zero</code></p>"
+    },
+    {
+      "time": "1.2",
+      "title": ":= 短变量声明（函数内）",
+      "description": "<p class=\"text-gray-600 mt-2\">目标：像 TS 的类型推导一样舒服，但保持 Go 的静态强类型。</p><pre class=\"mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs\"><code>package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"== 01.1B := short declaration ==\") // Output: == 01.1B := short declaration ==\n\n    x := 42\n    fmt.Printf(\"x=%d type=%T\\n\", x, x) // Output: x=42 type=int\n}\n</code></pre><p class=\"mt-2 text-xs text-gray-500\">运行：<code>go run ./cmd/lesson01_01b_short_decl</code></p>"
+    },
+    {
+      "time": "1.3",
+      "title": "显式类型转换（int vs int64）",
+      "description": "<p class=\"text-gray-600 mt-2\">目标：适应 Go 的“无隐式转换”，把边界问题前置到编译期。</p><pre class=\"mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs\"><code>package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"== 01.1C explicit conversion (int vs int64) ==\") // Output: == 01.1C explicit conversion (int vs int64) ==\n\n    x := 42\n    var big int64 = 1\n    sum := int64(x) + big\n    fmt.Printf(\"int64(x)+big=%d type=%T\\n\", sum, sum) // Output: int64(x)+big=43 type=int64\n}\n</code></pre><p class=\"mt-2 text-xs text-gray-500\">运行：<code>go run ./cmd/lesson01_01c_conversion</code></p>"
+    },
+    {
+      "time": "1.4",
+      "title": "const 常量",
+      "description": "<p class=\"text-gray-600 mt-2\">目标：理解 Go 的 const 更偏“编译期常量”，而不仅是“不可重新赋值”。</p><pre class=\"mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs\"><code>package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"== 01.1D constants ==\") // Output: == 01.1D constants ==\n\n    const pi = 3.14159\n    fmt.Printf(\"pi=%.2f type=%T\\n\", pi, pi) // Output: pi=3.14 type=float64\n}\n</code></pre><p class=\"mt-2 text-xs text-gray-500\">运行：<code>go run ./cmd/lesson01_01d_constants</code></p>"
+    }
+  ],
+  "impacts": [
+    {
+      "title": "局部默认用 :=",
+      "description": "更短、更清晰；只有在包级变量、需要零值、或要指定类型宽度时用 var。"
+    },
+    {
+      "title": "类型宽度重要时显式声明",
+      "description": "时间戳、字节大小、DB 字段等建议用 int64/uint64 等明确类型，避免跨平台差异。"
+    },
+    {
+      "title": "养成 gofmt / go run / go test 的循环",
+      "description": "Go 的工程体验依赖工具链：先格式化再运行/测试，后续做 API/MySQL 会更顺。"
+    }
+  ],
+  "perspectives": [
+    {
+      "title": "从 TS/Node 视角看零值",
+      "quote": "Go 把“可能不存在/没初始化”的问题用零值语义收敛，减少运行期 undefined/null 分支爆炸。"
+    },
+    {
+      "title": "从 TS/Node 视角看类型转换",
+      "quote": "Go 宁愿让你写显式转换，也不允许类型在不知不觉中变了；这对大型服务的可维护性很关键。"
+    }
+  ],
+  "misconceptions": [
+    {
+      "misconception": "“:= 到处都能用”",
+      "fact": ":= 只能在函数内使用；包级变量只能用 var。"
+    },
+    {
+      "misconception": "“int 和 int64 反正都是整数，直接加就行”",
+      "fact": "Go 不允许隐式转换，必须显式把其中一个转换成另一个类型。"
+    },
+    {
+      "misconception": "“声明了变量/导入了包不使用也没关系”",
+      "fact": "未使用的变量/导入会直接编译失败（这是一种工程约束）。"
+    }
+  ]
+}
+

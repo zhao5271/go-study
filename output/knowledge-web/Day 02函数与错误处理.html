@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day 02：函数与错误处理 - 知识卡片</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0F4C81;
+            --bg-cream: #F9F5F1;
+            --accent-color: #38BDF8;
+            --text-dark: #3A3530;
+            --card-border: #E5DED4;
+        }
+
+        body {
+            background-color: var(--bg-cream);
+            font-family: 'Noto Sans SC', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        h1, h2, .serif {
+            font-family: 'Noto Serif SC', serif;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .header-line {
+            width: 40px;
+            height: 3px;
+            background-color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .icon-box {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .article-image {
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .article-image img {
+            width: 100%;
+            max-width: 800px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .image-caption {
+            display: block;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            height: 6px;
+        }
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Header Section -->
+    <header class="max-w-6xl mx-auto mb-12">
+        <div class="article-image mb-8">
+            <img src="placeholder.png" alt="Day 02：函数与错误处理">
+        </div>
+        <div class="text-center">
+            <p class="text-gray-500 tracking-widest uppercase text-sm mb-2">KNOWLEDGE</p>
+            <h1 class="text-4xl md:text-5xl text-[var(--primary-color)] mb-4">Day 02：函数与错误处理</h1>
+            <div class="flex justify-center items-center gap-4">
+                <div class="h-[1px] w-12 bg-gray-300"></div>
+                <p class="text-lg italic font-medium">TS/Node → Go：从 try/catch 思维切到 (value, error) 工程习惯</p>
+                <div class="h-[1px] w-12 bg-gray-300"></div>
+            </div>
+
+            <div class="mt-8 bg-white p-6 rounded-lg border border-dashed border-[var(--accent-color)] max-w-3xl mx-auto">
+                <h3 class="text-[var(--accent-color)] font-bold mb-2">核心命题</h3>
+                <p class="text-xl">把错误当作“值”来设计与传递：用 wrap 加上下文，用 errors.Is/As 做稳定匹配，用 defer 管资源，用测试把边界锁死。</p>
+            </div>
+
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto space-y-12">
+
+        <section>
+            <div class="flex items-center gap-2 mb-6">
+                <div class="header-line"></div>
+                <h2 class="text-2xl font-bold text-[var(--primary-color)]">深层原因</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                <div class="card p-5">
+                    <div class="flex items-start gap-4">
+                        <div class="icon-box shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-1">错误是值，而不是异常</h4>
+                            <p class="text-sm text-gray-600">Go 倾向显式 `(value, error)`，避免 try/catch 漏捕或隐藏控制流；每一层都能加上下文并保持可匹配语义。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-5">
+                    <div class="flex items-start gap-4">
+                        <div class="icon-box shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-1">wrap 的取舍：语义 vs 抽象边界</h4>
+                            <p class="text-sm text-gray-600">用 `%w` 会把底层错误语义暴露给调用方（errors.Is/As 可匹配），等于把它变成 API 承诺；不想承诺就用 `%v` 只给人看。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-5">
+                    <div class="flex items-start gap-4">
+                        <div class="icon-box shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-1">defer 让资源释放不再靠记忆力</h4>
+                            <p class="text-sm text-gray-600">打开资源后立刻 defer 关闭，避免多 return 分支遗漏；并牢记三条规则：参数求值时机、LIFO、可修改具名返回值。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-5">
+                    <div class="flex items-start gap-4">
+                        <div class="icon-box shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-1">测试是第一等公民</h4>
+                            <p class="text-sm text-gray-600">table-driven tests + t.Run 子测试，把边界情况（not found、invalid input 等）固化为可重复验证的工程资产。</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section>
+            <div class="flex items-center gap-2 mb-6">
+                <div class="header-line"></div>
+                <h2 class="text-2xl font-bold text-[var(--primary-color)]">发展历程</h2>
+            </div>
+            <div class="relative overflow-x-auto scroll-container pb-4">
+                <div class="flex gap-6 min-w-[1200px]">
+
+                    <div class="flex-1">
+                        <div class="text-[var(--primary-color)] font-bold mb-2">2.1</div>
+                        <div class="card p-4 text-sm border-t-4 border-t-[var(--primary-color)]">
+                            <p class="font-bold">函数：多返回值与具名返回值</p>
+                            <p class="text-gray-600 mt-2">目标：用多返回值表达更多结果；理解具名返回值的“自文档化 + 零值初始化”取舍。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>go run ./cmd/day02_01_returns
+</code></pre><p class="mt-1 text-xs text-gray-500">代码：<code>go-learning/cmd/day02_01_returns/main.go</code></p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>// named returns are real variables (zero-valued)
+func split(sum int) (x, y int) {
+	x = sum * 4 / 9
+	y = sum - x
+	return
+}
+</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="flex-1">
+                        <div class="text-[var(--primary-color)] font-bold mb-2">2.2</div>
+                        <div class="card p-4 text-sm ">
+                            <p class="font-bold">(value, error) + wrap + errors.Is/As</p>
+                            <p class="text-gray-600 mt-2">目标：掌握 sentinel error、typed error、wrap（%w）以及 errors.Is/As/Unwrap。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>go run ./cmd/day02_02_errors
+</code></pre><p class="mt-1 text-xs text-gray-500">代码：<code>go-learning/cmd/day02_02_errors/main.go</code>（依赖 <code>go-learning/internal/day02/users/users.go</code>）</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>// sentinel error (match with errors.Is)
+var ErrUserNotFound = errors.New("user not found")
+
+// wrap with context, keep semantics
+return User{}, fmt.Errorf("find user %d: %w", id, ErrUserNotFound)
+</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="flex-1">
+                        <div class="text-[var(--primary-color)] font-bold mb-2">2.3</div>
+                        <div class="card p-4 text-sm ">
+                            <p class="font-bold">if init 与 := shadowing（必踩坑）</p>
+                            <p class="text-gray-600 mt-2">目标：理解为什么推荐 if init，同时避免 err 被 shadowing 导致的“外层 err 没更新”。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>go run ./cmd/day02_03_shadowing
+</code></pre><p class="mt-1 text-xs text-gray-500">代码：<code>go-learning/cmd/day02_03_shadowing/main.go</code></p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>// pitfall: := creates a new err (outer err unchanged)
+if _, err := users.FindUserSentinel(2); err != nil {
+	fmt.Printf("inside if: err=%v\n", err) // Output: inside if: err=find user 2: user not found
+}
+fmt.Printf("after if: outer err=%v\n", err) // Output: after if: outer err=&lt;nil&gt;
+</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="flex-1">
+                        <div class="text-[var(--primary-color)] font-bold mb-2">2.4</div>
+                        <div class="card p-4 text-sm ">
+                            <p class="font-bold">defer：LIFO / 参数求值 / 具名返回值</p>
+                            <p class="text-gray-600 mt-2">目标：记住三条规则，并会用 defer 做资源释放与返回值修饰。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>go run ./cmd/day02_04_defer
+</code></pre><p class="mt-1 text-xs text-gray-500">代码：<code>go-learning/cmd/day02_04_defer/main.go</code></p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>// defer args are evaluated immediately
+x := 1
+defer fmt.Printf("defer x=%d\n", x) // Output: defer x=1
+x = 2
+fmt.Printf("now x=%d\n", x) // Output: now x=2
+</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="flex-1">
+                        <div class="text-[var(--primary-color)] font-bold mb-2">2.5</div>
+                        <div class="card p-4 text-sm ">
+                            <p class="font-bold">panic vs error + recover（边界兜底）</p>
+                            <p class="text-gray-600 mt-2">目标：业务失败返回 error；panic 仅用于不可恢复错误；recover 只能在 defer 中兜底。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>go run ./cmd/day02_05_panic_recover
+</code></pre><p class="mt-1 text-xs text-gray-500">代码：<code>go-learning/cmd/day02_05_panic_recover/main.go</code></p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>func safe(fn func()) (recovered any) {
+	defer func() {
+		recovered = recover()
+	}()
+	fn()
+	return nil
+}
+</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="flex-1">
+                        <div class="text-[var(--primary-color)] font-bold mb-2">2.6</div>
+                        <div class="card p-4 text-sm ">
+                            <p class="font-bold">table-driven tests（用测试锁边界）</p>
+                            <p class="text-gray-600 mt-2">目标：掌握 tests 表 + t.Run 子测试的结构化写法。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>go test ./... -run TestFindUser
+</code></pre><p class="mt-1 text-xs text-gray-500">测试文件：<code>go-learning/internal/day02/users/users_test.go</code></p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>tests := []struct {
+	name string
+	id   int
+	wantErrIs error
+}{
+	{"found", 1, nil},
+	{"not found", 2, ErrUserNotFound},
+}
+
+for _, tt := range tests {
+	t.Run(tt.name, func(t *testing.T) {
+		_, err := FindUserSentinel(tt.id)
+		if tt.wantErrIs != nil &amp;&amp; !errors.Is(err, tt.wantErrIs) {
+			t.Fatalf("... ")
+		}
+	})
+}
+</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="flex-1">
+                        <div class="text-[var(--primary-color)] font-bold mb-2">Refs</div>
+                        <div class="card p-4 text-sm ">
+                            <p class="font-bold">参考资料 / References</p>
+                            <ul class="list-disc pl-5 text-sm text-gray-600 space-y-1"><li><span class="font-semibold">官方</span>：<a class="underline" href="https://go.dev/blog/go1.13-errors">Working with Errors in Go 1.13</a>（%w、wrap、errors.Is/As/Unwrap 的语义与取舍）</li><li><span class="font-semibold">官方</span>：<a class="underline" href="https://pkg.go.dev/errors">pkg.go.dev/errors</a>（errors.Is/As/Unwrap 文档）</li><li><span class="font-semibold">官方</span>：<a class="underline" href="https://pkg.go.dev/fmt#Errorf">pkg.go.dev/fmt#Errorf</a>（%w 行为说明）</li><li><span class="font-semibold">官方</span>：<a class="underline" href="https://go.dev/blog/defer-panic-and-recover">Defer, Panic, and Recover</a>（defer 三条规则 + recover 机制）</li><li><span class="font-semibold">官方</span>：<a class="underline" href="https://go.dev/blog/subtests">Using Subtests and Sub-benchmarks</a>（t.Run 子测试）</li><li><span class="font-semibold">官方</span>：<a class="underline" href="https://pkg.go.dev/testing">pkg.go.dev/testing</a>（testing 包与 go test）</li><li><span class="font-semibold">社区</span>：<a class="underline" href="https://github.com/uber-go/guide/blob/master/style.md">Uber Go Style Guide</a>（错误命名、wrap 取舍、处理模式）</li></ul>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="flex items-center gap-2 mb-6">
+                <div class="header-line"></div>
+                <h2 class="text-2xl font-bold text-[var(--primary-color)]">深远影响</h2>
+            </div>
+            <ul class="space-y-4">
+
+                <li class="flex gap-4 items-start">
+                    <span class="w-6 h-6 rounded-full bg-[var(--accent-color)] flex items-center justify-center text-white text-xs shrink-0 mt-1">1</span>
+                    <div>
+                        <span class="font-bold">对外错误语义要稳定：</span>
+                        <span class="text-gray-600">对外暴露 sentinel/type 语义；不要把底层库错误泄漏成 API 承诺（除非你愿意长期维护）。</span>
+                    </div>
+                </li>
+
+                <li class="flex gap-4 items-start">
+                    <span class="w-6 h-6 rounded-full bg-[var(--accent-color)] flex items-center justify-center text-white text-xs shrink-0 mt-1">2</span>
+                    <div>
+                        <span class="font-bold">上下文要短：</span>
+                        <span class="text-gray-600">wrap 时避免“failed to ...”层层堆叠，保持链条可读。</span>
+                    </div>
+                </li>
+
+                <li class="flex gap-4 items-start">
+                    <span class="w-6 h-6 rounded-full bg-[var(--accent-color)] flex items-center justify-center text-white text-xs shrink-0 mt-1">3</span>
+                    <div>
+                        <span class="font-bold">入口统一转换错误：</span>
+                        <span class="text-gray-600">在 handler/入口层把 error 转成 HTTP 响应；内部只返回 error，不直接写响应。</span>
+                    </div>
+                </li>
+
+            </ul>
+        </section>
+
+        <section class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+            <div class="bg-[var(--primary-color)] p-4 text-white">
+                <h3 class="font-bold">多元视角</h3>
+            </div>
+            <div class="p-6 space-y-6">
+
+                <div class="relative pl-6 border-l-2 border-gray-100">
+                    <div class="absolute -left-2 top-0 w-4 h-4 rounded-full bg-gray-200"></div>
+                    <p class="font-bold text-[var(--primary-color)] mb-1">TS/Node 对照：从 try/catch 到显式错误流</p>
+                    <p class="text-sm italic text-gray-500">"Go 不让错误偷偷穿过边界：每个调用点必须面对 err，这会让大型服务更稳定、更可测试。"</p>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="card p-8 bg-zinc-900 text-white">
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                <span class="text-yellow-500">⚠</span> 易错点纠偏
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+
+                <div class="space-y-2">
+                    <p class="text-zinc-400">误区：用 err == ErrXxx 判断就够了</p>
+                    <p class="text-white">事实：一旦你 wrap 了错误，必须用 errors.Is/As 才能稳定匹配。</p>
+                </div>
+
+                <div class="space-y-2">
+                    <p class="text-zinc-400">误区：看到 error 就 %w 一把梭</p>
+                    <p class="text-white">事实：wrap 会暴露底层错误语义，可能破坏抽象边界；不想承诺就用 %v。</p>
+                </div>
+
+                <div class="space-y-2">
+                    <p class="text-zinc-400">误区：panic 就是 Go 的 throw</p>
+                    <p class="text-white">事实：业务失败返回 error；panic 只用于不可恢复的程序错误，recover 仅做边界兜底。</p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="max-w-6xl mx-auto mt-16 pt-8 border-t border-gray-200 text-center text-gray-400 text-sm pb-12">
+        <p>《Day 02：函数与错误处理》知识卡片 | 生成时间：2026-03-17</p>
+    </footer>
+
+</body>
+</html>

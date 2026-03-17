@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go 语法基础：变量与零值（Lesson 01.1） - 知识卡片</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0F4C81;
+            --bg-cream: #F9F5F1;
+            --accent-color: #38BDF8;
+            --text-dark: #3A3530;
+            --card-border: #E5DED4;
+        }
+
+        body {
+            background-color: var(--bg-cream);
+            font-family: 'Noto Sans SC', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        h1, h2, .serif {
+            font-family: 'Noto Serif SC', serif;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        .header-line {
+            width: 40px;
+            height: 3px;
+            background-color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .icon-box {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .article-image {
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .article-image img {
+            width: 100%;
+            max-width: 800px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .image-caption {
+            display: block;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            height: 6px;
+        }
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: var(--accent-color);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Header Section -->
+    <header class="max-w-6xl mx-auto mb-12">
+        <div class="article-image mb-8">
+        </div>
+        <div class="text-center">
+            <p class="text-gray-500 tracking-widest uppercase text-sm mb-2">KNOWLEDGE</p>
+            <h1 class="text-4xl md:text-5xl text-[var(--primary-color)] mb-4">Go 语法基础：变量与零值（Lesson 01.1）</h1>
+            <div class="flex justify-center items-center gap-4">
+                <div class="h-[1px] w-12 bg-gray-300"></div>
+                <p class="text-lg italic font-medium">面向 Vue3 / TypeScript / Node 工程师的 Go 全栈入门第一步</p>
+                <div class="h-[1px] w-12 bg-gray-300"></div>
+            </div>
+
+            <div class="mt-8 bg-white p-6 rounded-lg border border-dashed border-[var(--accent-color)] max-w-3xl mx-auto">
+                <h3 class="text-[var(--accent-color)] font-bold mb-2">核心命题</h3>
+                <p class="text-xl">把 Go 的“零值 + 静态强类型 + 显式转换/显式错误”思维切过来，后面写 API（HTTP + MySQL）才稳、才可维护。</p>
+            </div>
+
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto space-y-12">
+
+        <section>
+            <div class="flex items-center gap-2 mb-6">
+                <div class="header-line"></div>
+                <h2 class="text-2xl font-bold text-[var(--primary-color)]">深层原因</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                <div class="card p-5">
+                    <div class="flex items-start gap-4">
+                        <div class="icon-box shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-1">零值（Zero Value）取代 undefined</h4>
+                            <p class="text-sm text-gray-600">Go 变量声明后立即可用：数值=0、字符串=""、布尔=false、引用类型=nil。用确定性降低“没初始化就用”的工程风险（对比 TS/JS 常见 undefined/null 坑）。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-5">
+                    <div class="flex items-start gap-4">
+                        <div class="icon-box shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-1">短变量声明 := 提升局部可读性</h4>
+                            <p class="text-sm text-gray-600">只在函数内使用，语法更短、类型推导更顺手；但依然是静态强类型，不是 JS 运行期随意变类型。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-5">
+                    <div class="flex items-start gap-4">
+                        <div class="icon-box shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-1">不做隐式类型转换（更早暴露问题）</h4>
+                            <p class="text-sm text-gray-600">int 不能直接加 int64，需要显式转换。用“多写一点转换”换取更可控的精度/溢出边界，把问题前置到编译期。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-5">
+                    <div class="flex items-start gap-4">
+                        <div class="icon-box shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-1">编译期严格约束（未使用即报错）</h4>
+                            <p class="text-sm text-gray-600">未使用的变量/导入会直接编译失败。取舍是更严格，但换来更干净的依赖与更少的“死代码/脏 import”。</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section>
+            <div class="flex items-center gap-2 mb-6">
+                <div class="header-line"></div>
+                <h2 class="text-2xl font-bold text-[var(--primary-color)]">发展历程</h2>
+            </div>
+            <div class="relative overflow-x-auto scroll-container pb-4">
+                <div class="flex gap-6 min-w-[1200px]">
+
+                    <div class="flex-1">
+                        <div class="text-[var(--primary-color)] font-bold mb-2">1.1</div>
+                        <div class="card p-4 text-sm border-t-4 border-t-[var(--primary-color)]">
+                            <p class="font-bold">var 声明 + 零值（Zero Value）</p>
+                            <p class="text-gray-600 mt-2">目标：建立“声明即初始化”的心智模型，告别 undefined。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("== 01.1A var + zero values ==") // Output: == 01.1A var + zero values ==
+
+    var count int
+    var name string
+    var ok bool
+    fmt.Printf("count=%d name=%q ok=%v\n", count, name, ok) // Output: count=0 name="" ok=false
+}
+</code></pre><p class="mt-2 text-xs text-gray-500">运行：<code>cd /Users/zhang/Desktop/go-study/codex/go-learning</code> 然后 <code>go run ./cmd/lesson01_01a_var_zero</code></p>
+                        </div>
+                    </div>
+
+                    <div class="flex-1">
+                        <div class="text-[var(--primary-color)] font-bold mb-2">1.2</div>
+                        <div class="card p-4 text-sm ">
+                            <p class="font-bold">:= 短变量声明（函数内）</p>
+                            <p class="text-gray-600 mt-2">目标：像 TS 的类型推导一样舒服，但保持 Go 的静态强类型。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("== 01.1B := short declaration ==") // Output: == 01.1B := short declaration ==
+
+    x := 42
+    fmt.Printf("x=%d type=%T\n", x, x) // Output: x=42 type=int
+}
+</code></pre><p class="mt-2 text-xs text-gray-500">运行：<code>go run ./cmd/lesson01_01b_short_decl</code></p>
+                        </div>
+                    </div>
+
+                    <div class="flex-1">
+                        <div class="text-[var(--primary-color)] font-bold mb-2">1.3</div>
+                        <div class="card p-4 text-sm ">
+                            <p class="font-bold">显式类型转换（int vs int64）</p>
+                            <p class="text-gray-600 mt-2">目标：适应 Go 的“无隐式转换”，把边界问题前置到编译期。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("== 01.1C explicit conversion (int vs int64) ==") // Output: == 01.1C explicit conversion (int vs int64) ==
+
+    x := 42
+    var big int64 = 1
+    sum := int64(x) + big
+    fmt.Printf("int64(x)+big=%d type=%T\n", sum, sum) // Output: int64(x)+big=43 type=int64
+}
+</code></pre><p class="mt-2 text-xs text-gray-500">运行：<code>go run ./cmd/lesson01_01c_conversion</code></p>
+                        </div>
+                    </div>
+
+                    <div class="flex-1">
+                        <div class="text-[var(--primary-color)] font-bold mb-2">1.4</div>
+                        <div class="card p-4 text-sm ">
+                            <p class="font-bold">const 常量</p>
+                            <p class="text-gray-600 mt-2">目标：理解 Go 的 const 更偏“编译期常量”，而不仅是“不可重新赋值”。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("== 01.1D constants ==") // Output: == 01.1D constants ==
+
+    const pi = 3.14159
+    fmt.Printf("pi=%.2f type=%T\n", pi, pi) // Output: pi=3.14 type=float64
+}
+</code></pre><p class="mt-2 text-xs text-gray-500">运行：<code>go run ./cmd/lesson01_01d_constants</code></p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="flex items-center gap-2 mb-6">
+                <div class="header-line"></div>
+                <h2 class="text-2xl font-bold text-[var(--primary-color)]">深远影响</h2>
+            </div>
+            <ul class="space-y-4">
+
+                <li class="flex gap-4 items-start">
+                    <span class="w-6 h-6 rounded-full bg-[var(--accent-color)] flex items-center justify-center text-white text-xs shrink-0 mt-1">1</span>
+                    <div>
+                        <span class="font-bold">局部默认用 :=：</span>
+                        <span class="text-gray-600">更短、更清晰；只有在包级变量、需要零值、或要指定类型宽度时用 var。</span>
+                    </div>
+                </li>
+
+                <li class="flex gap-4 items-start">
+                    <span class="w-6 h-6 rounded-full bg-[var(--accent-color)] flex items-center justify-center text-white text-xs shrink-0 mt-1">2</span>
+                    <div>
+                        <span class="font-bold">类型宽度重要时显式声明：</span>
+                        <span class="text-gray-600">时间戳、字节大小、DB 字段等建议用 int64/uint64 等明确类型，避免跨平台差异。</span>
+                    </div>
+                </li>
+
+                <li class="flex gap-4 items-start">
+                    <span class="w-6 h-6 rounded-full bg-[var(--accent-color)] flex items-center justify-center text-white text-xs shrink-0 mt-1">3</span>
+                    <div>
+                        <span class="font-bold">养成 gofmt / go run / go test 的循环：</span>
+                        <span class="text-gray-600">Go 的工程体验依赖工具链：先格式化再运行/测试，后续做 API/MySQL 会更顺。</span>
+                    </div>
+                </li>
+
+            </ul>
+        </section>
+
+        <section class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+            <div class="bg-[var(--primary-color)] p-4 text-white">
+                <h3 class="font-bold">多元视角</h3>
+            </div>
+            <div class="p-6 space-y-6">
+
+                <div class="relative pl-6 border-l-2 border-gray-100">
+                    <div class="absolute -left-2 top-0 w-4 h-4 rounded-full bg-gray-200"></div>
+                    <p class="font-bold text-[var(--primary-color)] mb-1">从 TS/Node 视角看零值</p>
+                    <p class="text-sm italic text-gray-500">"Go 把“可能不存在/没初始化”的问题用零值语义收敛，减少运行期 undefined/null 分支爆炸。"</p>
+                </div>
+
+                <div class="relative pl-6 border-l-2 border-gray-100">
+                    <div class="absolute -left-2 top-0 w-4 h-4 rounded-full bg-gray-200"></div>
+                    <p class="font-bold text-[var(--primary-color)] mb-1">从 TS/Node 视角看类型转换</p>
+                    <p class="text-sm italic text-gray-500">"Go 宁愿让你写显式转换，也不允许类型在不知不觉中变了；这对大型服务的可维护性很关键。"</p>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="card p-8 bg-zinc-900 text-white">
+            <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                <span class="text-yellow-500">⚠</span> 易错点纠偏
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+
+                <div class="space-y-2">
+                    <p class="text-zinc-400">误区：“:= 到处都能用”</p>
+                    <p class="text-white">事实：:= 只能在函数内使用；包级变量只能用 var。</p>
+                </div>
+
+                <div class="space-y-2">
+                    <p class="text-zinc-400">误区：“int 和 int64 反正都是整数，直接加就行”</p>
+                    <p class="text-white">事实：Go 不允许隐式转换，必须显式把其中一个转换成另一个类型。</p>
+                </div>
+
+                <div class="space-y-2">
+                    <p class="text-zinc-400">误区：“声明了变量/导入了包不使用也没关系”</p>
+                    <p class="text-white">事实：未使用的变量/导入会直接编译失败（这是一种工程约束）。</p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="max-w-6xl mx-auto mt-16 pt-8 border-t border-gray-200 text-center text-gray-400 text-sm pb-12">
+        <p>《Go 语法基础：变量与零值（Lesson 01.1）》知识卡片 | 生成时间：2026-03-17</p>
+    </footer>
+
+</body>
+</html>
