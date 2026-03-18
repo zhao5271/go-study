@@ -88,7 +88,7 @@ docker exec -it go-learning-mysql mysql -uapp -papp -D go_admin -e "INSERT INTO 
 - “创建用户”：插入 `users`；后面会加密码哈希、唯一约束冲突处理（409）。
 
 ### F. 代码示例（最小可运行）
-文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day05_01_mysql_crud/main.go`
+文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day05/01_mysql_crud/main.go`
 
 ### G. 怎么运行（命令 + 预期现象）
 先确保 MySQL 已启动（知识点 1）。
@@ -102,7 +102,7 @@ go get github.com/go-sql-driver/mysql
 
 运行：
 ```bash
-MYSQL_DSN="app:app@tcp(127.0.0.1:3307)/go_admin?parseTime=true" go run ./cmd/day05_01_mysql_crud
+MYSQL_DSN="app:app@tcp(127.0.0.1:3307)/go_admin?parseTime=true" go run ./cmd/day05/01_mysql_crud
 # Output: db ping ok
 # Output: inserted user id=4 (输出可能变化/不固定：自增 id 取决于现有数据)
 # Output: user: id=1 email=admin@example.com name=Admin role=admin
@@ -134,12 +134,12 @@ MYSQL_DSN="app:app@tcp(127.0.0.1:3307)/go_admin?parseTime=true" go run ./cmd/day
 - “创建用户（users）+ 记录操作（audit_logs）”必须同事务，保证一致性。
 
 ### F. 代码示例（最小可运行）
-文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day05_02_mysql_tx_rollback/main.go`
+文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day05/02_mysql_tx_rollback/main.go`
 
 ### G. 怎么运行（命令 + 预期现象）
 ```bash
 cd /Users/zhang/Desktop/go-study/codex/go-learning
-MYSQL_DSN="app:app@tcp(127.0.0.1:3307)/go_admin?parseTime=true" go run ./cmd/day05_02_mysql_tx_rollback
+MYSQL_DSN="app:app@tcp(127.0.0.1:3307)/go_admin?parseTime=true" go run ./cmd/day05/02_mysql_tx_rollback
 # Output: db ping ok
 # Output: 2006/01/02 15:04:05 expected err=Error 1062 ... (输出可能变化/不固定：错误信息随驱动/版本变化)
 # Output: rollback ok
@@ -161,4 +161,3 @@ MYSQL_DSN="app:app@tcp(127.0.0.1:3307)/go_admin?parseTime=true" go run ./cmd/day
 - 官方：Go `database/sql` 包文档 https://pkg.go.dev/database/sql （官方）
 - 驱动：go-sql-driver/mysql DSN 与 parseTime https://pkg.go.dev/github.com/go-sql-driver/mysql （官方/准官方）
 - 规范参考：`postgresql-table-design`（NOT NULL/约束/索引/命名的思维框架，落地到 MySQL 语法）
-

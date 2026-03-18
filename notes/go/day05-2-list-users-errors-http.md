@@ -23,12 +23,12 @@
 - 用户管理页：按关键字（email/name）搜索 + 分页展示。
 
 ### F. 代码示例（最小可运行）
-文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day05_03_list_users_sql/main.go`
+文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day05/03_list_users_sql/main.go`
 
 ### G. 怎么运行（命令 + 预期现象）
 ```bash
 cd /Users/zhang/Desktop/go-study/codex/go-learning
-MYSQL_DSN="app:app@tcp(127.0.0.1:3307)/go_admin?parseTime=true" go run ./cmd/day05_03_list_users_sql
+MYSQL_DSN="app:app@tcp(127.0.0.1:3307)/go_admin?parseTime=true" go run ./cmd/day05/03_list_users_sql
 # Output: total=2 (输出可能变化/不固定：取决于数据与 search)
 # Output: user: id=1 email=admin@example.com name=Admin role=admin
 ```
@@ -63,7 +63,7 @@ MYSQL_DSN="app:app@tcp(127.0.0.1:3307)/go_admin?parseTime=true" go run ./cmd/day
 - `GET /api/v1/users?page=1&size=20&search=a`：用户列表页的核心接口（后面再加鉴权/角色权限）。
 
 ### F. 代码示例（最小可运行）
-文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day05_04_http_users_list/main.go`
+文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day05/04_http_users_list/main.go`
 
 错误码表（草案）：
 | HTTP | code | message | 场景 |
@@ -78,7 +78,7 @@ MYSQL_DSN="app:app@tcp(127.0.0.1:3307)/go_admin?parseTime=true" go run ./cmd/day
 ### G. 怎么运行（命令 + 预期现象）
 ```bash
 cd /Users/zhang/Desktop/go-study/codex/go-learning
-PORT=18080 MYSQL_DSN="app:app@tcp(127.0.0.1:3307)/go_admin?parseTime=true" go run ./cmd/day05_04_http_users_list
+PORT=18080 MYSQL_DSN="app:app@tcp(127.0.0.1:3307)/go_admin?parseTime=true" go run ./cmd/day05/04_http_users_list
 # Output: 2006/01/02 15:04:05 listening on :18080 (输出可能变化/不固定：包含时间戳)
 ```
 

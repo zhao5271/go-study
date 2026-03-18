@@ -54,6 +54,6 @@ for _, tt := range tests {
 ```
 
 ## 项目结构（学习用最小版）
-- `go-learning/cmd/dayNN_*`：每个知识点一个可运行入口
+- `go-learning/cmd/dayNN/*`：每个知识点一个可运行入口
 - `go-learning/internal/...`：可复用逻辑 + 可测试
 - 笔记：`notes/go/dayNN-*.md` + 索引文件（progress/glossary/patterns/pitfalls）

@@ -26,22 +26,22 @@
     {
       "time": "1.1",
       "title": "var 声明 + 零值（Zero Value）",
-      "description": "<p class=\"text-gray-600 mt-2\">目标：建立“声明即初始化”的心智模型，告别 undefined。</p><pre class=\"mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs\"><code>package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"== 01.1A var + zero values ==\") // Output: == 01.1A var + zero values ==\n\n    var count int\n    var name string\n    var ok bool\n    fmt.Printf(\"count=%d name=%q ok=%v\\n\", count, name, ok) // Output: count=0 name=\"\" ok=false\n}\n</code></pre><p class=\"mt-2 text-xs text-gray-500\">运行：<code>cd /Users/zhang/Desktop/go-study/codex/go-learning</code> 然后 <code>go run ./cmd/lesson01_01a_var_zero</code></p>"
+      "description": "<p class=\"text-gray-600 mt-2\">目标：建立“声明即初始化”的心智模型，告别 undefined。</p><pre class=\"mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs\"><code>package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"== 01.1A var + zero values ==\") // Output: == 01.1A var + zero values ==\n\n    var count int\n    var name string\n    var ok bool\n    fmt.Printf(\"count=%d name=%q ok=%v\\n\", count, name, ok) // Output: count=0 name=\"\" ok=false\n}\n</code></pre><p class=\"mt-2 text-xs text-gray-500\">运行：<code>cd /Users/zhang/Desktop/go-study/codex/go-learning</code> 然后 <code>go run ./cmd/legacy/lesson01_01a_var_zero</code></p>"
     },
     {
       "time": "1.2",
       "title": ":= 短变量声明（函数内）",
-      "description": "<p class=\"text-gray-600 mt-2\">目标：像 TS 的类型推导一样舒服，但保持 Go 的静态强类型。</p><pre class=\"mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs\"><code>package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"== 01.1B := short declaration ==\") // Output: == 01.1B := short declaration ==\n\n    x := 42\n    fmt.Printf(\"x=%d type=%T\\n\", x, x) // Output: x=42 type=int\n}\n</code></pre><p class=\"mt-2 text-xs text-gray-500\">运行：<code>go run ./cmd/lesson01_01b_short_decl</code></p>"
+      "description": "<p class=\"text-gray-600 mt-2\">目标：像 TS 的类型推导一样舒服，但保持 Go 的静态强类型。</p><pre class=\"mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs\"><code>package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"== 01.1B := short declaration ==\") // Output: == 01.1B := short declaration ==\n\n    x := 42\n    fmt.Printf(\"x=%d type=%T\\n\", x, x) // Output: x=42 type=int\n}\n</code></pre><p class=\"mt-2 text-xs text-gray-500\">运行：<code>go run ./cmd/legacy/lesson01_01b_short_decl</code></p>"
     },
     {
       "time": "1.3",
       "title": "显式类型转换（int vs int64）",
-      "description": "<p class=\"text-gray-600 mt-2\">目标：适应 Go 的“无隐式转换”，把边界问题前置到编译期。</p><pre class=\"mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs\"><code>package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"== 01.1C explicit conversion (int vs int64) ==\") // Output: == 01.1C explicit conversion (int vs int64) ==\n\n    x := 42\n    var big int64 = 1\n    sum := int64(x) + big\n    fmt.Printf(\"int64(x)+big=%d type=%T\\n\", sum, sum) // Output: int64(x)+big=43 type=int64\n}\n</code></pre><p class=\"mt-2 text-xs text-gray-500\">运行：<code>go run ./cmd/lesson01_01c_conversion</code></p>"
+      "description": "<p class=\"text-gray-600 mt-2\">目标：适应 Go 的“无隐式转换”，把边界问题前置到编译期。</p><pre class=\"mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs\"><code>package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"== 01.1C explicit conversion (int vs int64) ==\") // Output: == 01.1C explicit conversion (int vs int64) ==\n\n    x := 42\n    var big int64 = 1\n    sum := int64(x) + big\n    fmt.Printf(\"int64(x)+big=%d type=%T\\n\", sum, sum) // Output: int64(x)+big=43 type=int64\n}\n</code></pre><p class=\"mt-2 text-xs text-gray-500\">运行：<code>go run ./cmd/legacy/lesson01_01c_conversion</code></p>"
     },
     {
       "time": "1.4",
       "title": "const 常量",
-      "description": "<p class=\"text-gray-600 mt-2\">目标：理解 Go 的 const 更偏“编译期常量”，而不仅是“不可重新赋值”。</p><pre class=\"mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs\"><code>package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"== 01.1D constants ==\") // Output: == 01.1D constants ==\n\n    const pi = 3.14159\n    fmt.Printf(\"pi=%.2f type=%T\\n\", pi, pi) // Output: pi=3.14 type=float64\n}\n</code></pre><p class=\"mt-2 text-xs text-gray-500\">运行：<code>go run ./cmd/lesson01_01d_constants</code></p>"
+      "description": "<p class=\"text-gray-600 mt-2\">目标：理解 Go 的 const 更偏“编译期常量”，而不仅是“不可重新赋值”。</p><pre class=\"mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs\"><code>package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"== 01.1D constants ==\") // Output: == 01.1D constants ==\n\n    const pi = 3.14159\n    fmt.Printf(\"pi=%.2f type=%T\\n\", pi, pi) // Output: pi=3.14 type=float64\n}\n</code></pre><p class=\"mt-2 text-xs text-gray-500\">运行：<code>go run ./cmd/legacy/lesson01_01d_constants</code></p>"
     }
   ],
   "impacts": [
@@ -83,4 +83,3 @@
     }
   ]
 }
-

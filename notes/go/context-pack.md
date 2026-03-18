@@ -25,8 +25,7 @@
 - 模式库：`notes/go/patterns.md`
 - 坑点库：`notes/go/pitfalls.md`
 - Day 笔记：`notes/go/dayNN-*.md`
-- 代码：`go-learning/`（按 `cmd/dayNN_*` 拆分）
+- 代码：`go-learning/`（按 `cmd/dayNN/*` 拆分）
 
 ## 当前进度
 请先读取 `notes/go/progress.md`，然后开始今天的学习主题。
-

@@ -52,7 +52,7 @@ Use when the user asks to:
 - 仓库根目录：`/Users/zhang/Desktop/go-study/codex`
 - Go module 在：`/Users/zhang/Desktop/go-study/codex/go-learning`
   - 任何 `go run/go test/go mod` **都必须在 `go-learning/` 目录执行**（根目录不是 Go module，会报 `cannot find main module`）
-- 可运行示例入口：`go-learning/cmd/dayNN_*`（以及 `dayNN_XX_*` / `dayNN_XX_*_ex*`）
+- 可运行示例入口：`go-learning/cmd/dayNN/*`（以及更细的子目录，如 `go-learning/cmd/day03/02_interfaces_embedding_ex1`）
 - 可复用内部包：`go-learning/internal/...`
   - HTTP 工具包约定：`go-learning/internal/httpkit`（统一 JSON 响应 + 分页 query 解析）
 - MySQL Docker Compose：`go-learning/infra/mysql`（端口映射 `3307:3306`，避免占用本机 3306）
@@ -82,7 +82,7 @@ docker compose stop
 
 | 操作 | 触发方式（用户怎么说） | 输入 | 输出（文件/结果） |
 |---|---|---|---|
-| A. 开始今天学习（默认） | “开始今天/DayNN 学习：xxx” | Day 编号 + 主题 | `go-learning/cmd/dayNN_*` + `notes/go/dayNN-*.md` |
+| A. 开始今天学习（默认） | “开始今天/DayNN 学习：xxx” | Day 编号 + 主题 | `go-learning/cmd/dayNN/*` + `notes/go/dayNN-*.md` |
 | A2. 继续学习（默认接着学） | “继续学习” | 无 | 读取 `notes/go/progress.md` 的 Next Step → 按 A–I 输出并落盘 |
 | A3. 查看学习进度 | “查看学习进度/现在到第几天了/学到哪了” | 无 | 读取并总结 `notes/go/progress.md`（指出当前 Day 与下一步） |
 | B. 代码评审 | “review 这段 Go 代码/这个 PR/这段报错” | 代码/报错/路径 | 改进版代码 + 解释取舍（可写回文件） |

@@ -180,8 +180,8 @@
                         <div class="text-[var(--primary-color)] font-bold mb-2">2.1</div>
                         <div class="card p-4 text-sm border-t-4 border-t-[var(--primary-color)]">
                             <p class="font-bold">函数：多返回值与具名返回值</p>
-                            <p class="text-gray-600 mt-2">目标：用多返回值表达更多结果；理解具名返回值的“自文档化 + 零值初始化”取舍。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>go run ./cmd/day02_01_returns
-</code></pre><p class="mt-1 text-xs text-gray-500">代码：<code>go-learning/cmd/day02_01_returns/main.go</code></p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>// named returns are real variables (zero-valued)
+                            <p class="text-gray-600 mt-2">目标：用多返回值表达更多结果；理解具名返回值的“自文档化 + 零值初始化”取舍。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>go run ./cmd/day02/01_returns
+</code></pre><p class="mt-1 text-xs text-gray-500">代码：<code>go-learning/cmd/day02/01_returns/main.go</code></p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>// named returns are real variables (zero-valued)
 func split(sum int) (x, y int) {
 	x = sum * 4 / 9
 	y = sum - x
@@ -195,8 +195,8 @@ func split(sum int) (x, y int) {
                         <div class="text-[var(--primary-color)] font-bold mb-2">2.2</div>
                         <div class="card p-4 text-sm ">
                             <p class="font-bold">(value, error) + wrap + errors.Is/As</p>
-                            <p class="text-gray-600 mt-2">目标：掌握 sentinel error、typed error、wrap（%w）以及 errors.Is/As/Unwrap。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>go run ./cmd/day02_02_errors
-</code></pre><p class="mt-1 text-xs text-gray-500">代码：<code>go-learning/cmd/day02_02_errors/main.go</code>（依赖 <code>go-learning/internal/day02/users/users.go</code>）</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>// sentinel error (match with errors.Is)
+                            <p class="text-gray-600 mt-2">目标：掌握 sentinel error、typed error、wrap（%w）以及 errors.Is/As/Unwrap。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>go run ./cmd/day02/02_errors
+</code></pre><p class="mt-1 text-xs text-gray-500">代码：<code>go-learning/cmd/day02/02_errors/main.go</code>（依赖 <code>go-learning/internal/day02/users/users.go</code>）</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>// sentinel error (match with errors.Is)
 var ErrUserNotFound = errors.New("user not found")
 
 // wrap with context, keep semantics
@@ -209,8 +209,8 @@ return User{}, fmt.Errorf("find user %d: %w", id, ErrUserNotFound)
                         <div class="text-[var(--primary-color)] font-bold mb-2">2.3</div>
                         <div class="card p-4 text-sm ">
                             <p class="font-bold">if init 与 := shadowing（必踩坑）</p>
-                            <p class="text-gray-600 mt-2">目标：理解为什么推荐 if init，同时避免 err 被 shadowing 导致的“外层 err 没更新”。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>go run ./cmd/day02_03_shadowing
-</code></pre><p class="mt-1 text-xs text-gray-500">代码：<code>go-learning/cmd/day02_03_shadowing/main.go</code></p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>// pitfall: := creates a new err (outer err unchanged)
+                            <p class="text-gray-600 mt-2">目标：理解为什么推荐 if init，同时避免 err 被 shadowing 导致的“外层 err 没更新”。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>go run ./cmd/day02/03_shadowing
+</code></pre><p class="mt-1 text-xs text-gray-500">代码：<code>go-learning/cmd/day02/03_shadowing/main.go</code></p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>// pitfall: := creates a new err (outer err unchanged)
 if _, err := users.FindUserSentinel(2); err != nil {
 	fmt.Printf("inside if: err=%v\n", err) // Output: inside if: err=find user 2: user not found
 }
@@ -223,8 +223,8 @@ fmt.Printf("after if: outer err=%v\n", err) // Output: after if: outer err=&lt;n
                         <div class="text-[var(--primary-color)] font-bold mb-2">2.4</div>
                         <div class="card p-4 text-sm ">
                             <p class="font-bold">defer：LIFO / 参数求值 / 具名返回值</p>
-                            <p class="text-gray-600 mt-2">目标：记住三条规则，并会用 defer 做资源释放与返回值修饰。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>go run ./cmd/day02_04_defer
-</code></pre><p class="mt-1 text-xs text-gray-500">代码：<code>go-learning/cmd/day02_04_defer/main.go</code></p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>// defer args are evaluated immediately
+                            <p class="text-gray-600 mt-2">目标：记住三条规则，并会用 defer 做资源释放与返回值修饰。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>go run ./cmd/day02/04_defer
+</code></pre><p class="mt-1 text-xs text-gray-500">代码：<code>go-learning/cmd/day02/04_defer/main.go</code></p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>// defer args are evaluated immediately
 x := 1
 defer fmt.Printf("defer x=%d\n", x) // Output: defer x=1
 x = 2
@@ -237,8 +237,8 @@ fmt.Printf("now x=%d\n", x) // Output: now x=2
                         <div class="text-[var(--primary-color)] font-bold mb-2">2.5</div>
                         <div class="card p-4 text-sm ">
                             <p class="font-bold">panic vs error + recover（边界兜底）</p>
-                            <p class="text-gray-600 mt-2">目标：业务失败返回 error；panic 仅用于不可恢复错误；recover 只能在 defer 中兜底。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>go run ./cmd/day02_05_panic_recover
-</code></pre><p class="mt-1 text-xs text-gray-500">代码：<code>go-learning/cmd/day02_05_panic_recover/main.go</code></p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>func safe(fn func()) (recovered any) {
+                            <p class="text-gray-600 mt-2">目标：业务失败返回 error；panic 仅用于不可恢复错误；recover 只能在 defer 中兜底。</p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>go run ./cmd/day02/05_panic_recover
+</code></pre><p class="mt-1 text-xs text-gray-500">代码：<code>go-learning/cmd/day02/05_panic_recover/main.go</code></p><pre class="mt-3 bg-zinc-900 text-zinc-100 p-4 rounded-lg overflow-x-auto text-xs"><code>func safe(fn func()) (recovered any) {
 	defer func() {
 		recovered = recover()
 	}()

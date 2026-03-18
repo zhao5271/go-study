@@ -14,7 +14,7 @@
 - 404/405/400 等非业务错误也要“稳定格式”，否则前端会出现大量分支处理
 
 ## 代码清单
-- `go-learning/cmd/day04_02_http_admin_api_min/main.go`
+- `go-learning/cmd/day04/02_http_admin_api_min/main.go`
 
 ## 常见坑
 - `Content-Type` 必须在 `WriteHeader/Write/Encode` 前设置
@@ -29,4 +29,3 @@
 ## 下一步
 - 把 `/api/v1/users` 接上 MySQL：分页 + 模糊搜索 + 统一错误码
 - 引入 `context.WithTimeout`：避免慢查询/下游卡死拖垮服务
-

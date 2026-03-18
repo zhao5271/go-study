@@ -34,7 +34,7 @@
 ### F. 代码示例（最小可运行）
 
 运行：
-- `cd /Users/zhang/Desktop/go-study/codex/go-learning && PORT=18080 go run ./cmd/day04_01a_http_mux`
+- `cd /Users/zhang/Desktop/go-study/codex/go-learning && PORT=18080 go run ./cmd/day04/01a_http_mux`
 
 验证（另开一个终端）：
 - `curl -i http://localhost:18080/health`
@@ -46,7 +46,7 @@
     - `HTTP/1.1 405 Method Not Allowed`
     - body：`method not allowed`
 
-代码（全文）：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day04_01a_http_mux/main.go`
+代码（全文）：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day04/01a_http_mux/main.go`
 ```go
 package main
 
@@ -82,7 +82,7 @@ func main() {
 ```
 
 ### G. 怎么运行（命令 + 预期现象）
-- 启动：`cd go-learning && PORT=18080 go run ./cmd/day04_01a_http_mux`
+- 启动：`cd go-learning && PORT=18080 go run ./cmd/day04/01a_http_mux`
 - 预期现象：终端打印 listening；curl `/health` 返回 200 + `ok`
 
 ### H. 练习题（1–3 题，覆盖边界条件）
@@ -117,7 +117,7 @@ func main() {
 ### F. 代码示例（最小可运行）
 
 运行：
-- `cd /Users/zhang/Desktop/go-study/codex/go-learning && PORT=18080 go run ./cmd/day04_01b_json_errors`
+- `cd /Users/zhang/Desktop/go-study/codex/go-learning && PORT=18080 go run ./cmd/day04/01b_json_errors`
 
 验证（另开一个终端）：
 - `curl -s http://localhost:18080/api/v1/health`
@@ -130,7 +130,7 @@ func main() {
   - 典型响应：
     - `{"code":10002,"message":"INVALID_QUERY"}`
 
-代码（全文）：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day04_01b_json_errors/main.go`
+代码（全文）：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day04/01b_json_errors/main.go`
 ```go
 package main
 
@@ -218,7 +218,7 @@ func main() {
 ```
 
 ### G. 怎么运行（命令 + 预期现象）
-- 启动：`cd go-learning && PORT=18080 go run ./cmd/day04_01b_json_errors`
+- 启动：`cd go-learning && PORT=18080 go run ./cmd/day04/01b_json_errors`
 - 预期现象：`curl` `/api/v1/health` 返回统一 JSON；`/api/v1/users` 支持分页，非法参数返回 400 + 业务码。
 
 ### H. 练习题（1–3 题，覆盖边界条件）
@@ -236,20 +236,20 @@ func main() {
 ### I. 参考答案（每题后紧跟可运行答案）
 
 #### 练习 1 参考答案（可运行）
-- 运行：`cd /Users/zhang/Desktop/go-study/codex/go-learning && PORT=18080 go run ./cmd/day04_01b_json_errors_ex1`
+- 运行：`cd /Users/zhang/Desktop/go-study/codex/go-learning && PORT=18080 go run ./cmd/day04/01b_json_errors_ex1`
 - 验证：
   - `curl -s http://localhost:18080/api/v1/ping` 典型响应：`{"code":0,"message":"OK","data":{"pong":"pong"}}`
   - `curl -s -X POST http://localhost:18080/api/v1/ping` 典型响应：`{"code":10001,"message":"METHOD_NOT_ALLOWED"}`
 
-代码（全文）：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day04_01b_json_errors_ex1/main.go`
+代码（全文）：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day04/01b_json_errors_ex1/main.go`
 
 #### 练习 2 参考答案（可运行）
-- 运行：`cd /Users/zhang/Desktop/go-study/codex/go-learning && PORT=18080 go run ./cmd/day04_01b_json_errors_ex2`
+- 运行：`cd /Users/zhang/Desktop/go-study/codex/go-learning && PORT=18080 go run ./cmd/day04/01b_json_errors_ex2`
 - 验证：
   - `curl -s http://localhost:18080/api/v1/health` 典型响应：`{"code":0,"message":"OK","data":{"ok":true}}`
   - `curl -s http://localhost:18080/api/v1/not-exist` 典型响应：`{"code":10004,"message":"NOT_FOUND"}`
 
-代码（全文）：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day04_01b_json_errors_ex2/main.go`
+代码（全文）：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day04/01b_json_errors_ex2/main.go`
 
 ---
 

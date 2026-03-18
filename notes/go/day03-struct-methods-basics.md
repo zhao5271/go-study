@@ -27,7 +27,7 @@ cd /Users/zhang/Desktop/go-study/codex/go-learning
 你会有 `User`、`Role`、`Permission`、`ListUsersResponse` 等 struct；零值决定了“缺省行为”。
 
 ### F. 代码示例（最小可运行）
-文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day03_01a_struct_zero/main.go`
+文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day03/01a_struct_zero/main.go`
 ```go
 package main
 
@@ -55,7 +55,7 @@ func main() {
 
 ### G. 怎么运行（命令 + 预期现象）
 ```bash
-go run ./cmd/day03_01a_struct_zero
+go run ./cmd/day03/01a_struct_zero
 # Output: == Day03.1a: struct + zero value ==
 # Output: u={ID:0 Name: Admin:false}
 # Output: u2={ID:1 Name:Alice Admin:true}
@@ -68,7 +68,7 @@ go run ./cmd/day03_01a_struct_zero
 
 ### I. 参考答案
 参考答案 1：  
-把 `Age int` 加进 struct，重新跑 `go run ./cmd/day03_01a_struct_zero`，输出里会出现 `Age:0`（典型输出可略有差异，但零值应为 0）。
+把 `Age int` 加进 struct，重新跑 `go run ./cmd/day03/01a_struct_zero`，输出里会出现 `Age:0`（典型输出可略有差异，但零值应为 0）。
 
 ---
 
@@ -89,7 +89,7 @@ go run ./cmd/day03_01a_struct_zero
 例如 `type UserService struct{ repo ... }`，方法 `CreateUser(...)` 基本都用指针接收者；否则你很难在内部维护状态（比如缓存、统计）。
 
 ### F. 代码示例（最小可运行）
-文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day03_01b_methods_receivers/main.go`
+文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day03/01b_methods_receivers/main.go`
 ```go
 package main
 
@@ -128,7 +128,7 @@ func main() {
 
 ### G. 怎么运行（命令 + 预期现象）
 ```bash
-go run ./cmd/day03_01b_methods_receivers
+go run ./cmd/day03/01b_methods_receivers
 # Output: == Day03.1b: methods + value/pointer receiver ==
 # Output: after IncByValue: c.N=10
 # Output: after IncByPtr:   c.N=11
@@ -166,7 +166,7 @@ func (c Counter) IncByValue() Counter { c.N++; return c }
 `PATCH /api/v1/users/{id}`：前端可能只传 `{ "admin": false }`，你必须把它当成“显式设置”，而不是“缺省”。
 
 ### F. 代码示例（最小可运行）
-文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day03_01c_json_optional_fields/main.go`
+文件：`/Users/zhang/Desktop/go-study/codex/go-learning/cmd/day03/01c_json_optional_fields/main.go`
 ```go
 package main
 
@@ -203,7 +203,7 @@ func main() {
 
 ### G. 怎么运行（命令 + 预期现象）
 ```bash
-go run ./cmd/day03_01c_json_optional_fields
+go run ./cmd/day03/01c_json_optional_fields
 # Output: == Day03.1c: JSON optional fields (pointer) ==
 # Output: missing: nameNil=true adminNil=true
 # Output: explicit false: adminNil=false adminVal=false
@@ -218,7 +218,7 @@ go run ./cmd/day03_01c_json_optional_fields
 
 ### I. 参考答案
 参考答案 1（可运行做法）：  
-你可以先在 `day03_01c_json_optional_fields/main.go` 里加一个 `User` struct 和 `ApplyPatch(user, req)` 函数，最后 `fmt.Printf` 打印更新前后（打印要写典型输出注释）。
+你可以先在 `day03/01c_json_optional_fields/main.go` 里加一个 `User` struct 和 `ApplyPatch(user, req)` 函数，最后 `fmt.Printf` 打印更新前后（打印要写典型输出注释）。
 
 ---
 

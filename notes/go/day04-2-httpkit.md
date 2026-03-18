@@ -60,7 +60,7 @@ func WriteError(w http.ResponseWriter, status int, code int, message string) {
 ### G. 怎么运行（命令 + 预期现象）
 这个文件是库文件，不能直接 `go run`。你可以通过现有示例验证它生效：
 ```bash
-PORT=18080 go run ./cmd/day04_01b_json_errors
+PORT=18080 go run ./cmd/day04/01b_json_errors
 # Output: 2006/01/02 15:04:05 listening on :18080 (输出可能变化/不固定：包含时间戳)
 ```
 然后：
@@ -74,9 +74,9 @@ curl -s http://localhost:18080/api/v1/health
 - 验收标准：成功与失败都返回统一 JSON（用 curl 验证）
 
 ### I. 参考答案（紧跟练习题）
-参考答案 1：见 `day04_01b_json_errors_ex1`，它已经使用 `httpkit.WriteJSON/WriteError`：
+参考答案 1：见 `day04/01b_json_errors_ex1`，它已经使用 `httpkit.WriteJSON/WriteError`：
 ```bash
-PORT=18080 go run ./cmd/day04_01b_json_errors_ex1
+PORT=18080 go run ./cmd/day04/01b_json_errors_ex1
 # Output: 2006/01/02 15:04:05 listening on :18080 (输出可能变化/不固定：包含时间戳)
 ```
 
@@ -136,9 +136,9 @@ func ParsePageSize(r *http.Request) (page int, size int, err error) {
 ```
 
 ### G. 怎么运行（命令 + 预期现象）
-用 `day04_01b_json_errors` 或 `day05_04_http_users_list` 验证解析与 400 返回：
+用 `day04/01b_json_errors` 或 `day05/04_http_users_list` 验证解析与 400 返回：
 ```bash
-PORT=18080 go run ./cmd/day04_01b_json_errors
+PORT=18080 go run ./cmd/day04/01b_json_errors
 # Output: 2006/01/02 15:04:05 listening on :18080 (输出可能变化/不固定：包含时间戳)
 ```
 然后：
@@ -154,7 +154,7 @@ curl -s "http://localhost:18080/api/v1/users?page=0"
   - `size=101` 返回 400 + `INVALID_QUERY`
 
 ### I. 参考答案
-参考答案 1：照抄 `day04_01b_json_errors` 的 `/api/v1/users` 写法即可——解析失败就 `httpkit.WriteError(400,10002,"INVALID_QUERY")`。
+参考答案 1：照抄 `day04/01b_json_errors` 的 `/api/v1/users` 写法即可——解析失败就 `httpkit.WriteError(400,10002,"INVALID_QUERY")`。
 
 ---
 
