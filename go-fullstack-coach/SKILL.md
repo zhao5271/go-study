@@ -1,6 +1,6 @@
 ---
 name: go-fullstack-coach
-description: Teach Go fullstack (API + MySQL) to an experienced Vue3/TypeScript developer. Triggers when user says “开始学习/开始今天学习/开始 DayXX 学习”. Uses NotebookLM first, falls back to web with references. Produces runnable code + structured study notes, and provides code review + interview coaching.
+description: Teach Go fullstack (API + MySQL) to an experienced Vue3/TypeScript developer. Triggers when user says “开始学习/继续学习/查看学习进度/开始今天学习/开始 DayXX 学习”. Uses NotebookLM first, falls back to web with references. Produces runnable code + structured study notes, and provides code review + interview coaching.
 ---
 
 # go-fullstack-coach
@@ -34,6 +34,8 @@ description: Teach Go fullstack (API + MySQL) to an experienced Vue3/TypeScript 
 
 Use when the user asks to:
 - “开始学习 / 开始今天学习 / 开始 DayXX 学习”（默认进入“开始今天学习”流程）
+- “继续学习”（默认从 `notes/go/progress.md` 的 Next Step 接着往下讲）
+- “查看学习进度 / 现在到第几天了 / 学到哪了”（读取 `notes/go/progress.md` 并用绝对路径指向相关笔记）
 - Learn Go/Golang from a TS/Vue/Node background
 - Build backend APIs in Go (REST) with MySQL
 - Learn Go concurrency/runtime/GC/scheduler
@@ -81,6 +83,8 @@ docker compose stop
 | 操作 | 触发方式（用户怎么说） | 输入 | 输出（文件/结果） |
 |---|---|---|---|
 | A. 开始今天学习（默认） | “开始今天/DayNN 学习：xxx” | Day 编号 + 主题 | `go-learning/cmd/dayNN_*` + `notes/go/dayNN-*.md` |
+| A2. 继续学习（默认接着学） | “继续学习” | 无 | 读取 `notes/go/progress.md` 的 Next Step → 按 A–I 输出并落盘 |
+| A3. 查看学习进度 | “查看学习进度/现在到第几天了/学到哪了” | 无 | 读取并总结 `notes/go/progress.md`（指出当前 Day 与下一步） |
 | B. 代码评审 | “review 这段 Go 代码/这个 PR/这段报错” | 代码/报错/路径 | 改进版代码 + 解释取舍（可写回文件） |
 | C. Debug 报错 | “这段 go run/go build 报错” | 报错栈 + 路径 | 定位原因 + 修复 + 验证步骤 |
 | D. 复盘/压缩上下文 | “对话太长/帮我压缩” | 无 | 更新 `notes/go/progress.md` + 建议开新线程用 `notes/go/context-pack.md` |
@@ -183,11 +187,22 @@ flowchart TD
 Day01：语法地基 → Day02：错误处理 → Day03：struct/接口（分层基础）→ Day04：net/http + 抽公共包 → Day05：MySQL + Docker Compose + 接回列表 API → Day06：Gin 工程化落地 → Day07：超时/取消/优雅退出/日志/可观测性
 
 ## 触发约定（让“开始学习”自动触发）
-如果用户消息里出现以下任意一句（或同义表达），默认视为触发本 skill，并走 **操作 A：开始今天学习**：
+如果用户消息里出现以下任意一句（或同义表达），默认视为触发本 skill，并按下面规则执行：
 - “开始学习”
 - “开始今天学习”
 - “开始 DayXX 学习”
+- “继续学习”
+- “查看学习进度 / 现在到第几天了 / 学到哪了”
+
+### 触发后的路由规则（强制）
+1) 若命中“查看学习进度/现在到第几天了/学到哪了”：走 **A3 查看学习进度**
+2) 否则若命中“继续学习”：走 **A2 继续学习**
+3) 否则：走 **A 开始今天学习（默认）**
 
 若用户只说“开始学习”但没给 Day/主题：
 1) 先读取 `notes/go/progress.md`
 2) 默认建议进入下一天（progress 里的 Next Step），并用一句话向用户确认今天主题即可。
+
+若用户只说“继续学习”：
+1) 先读取 `notes/go/progress.md`
+2) 直接进入 progress 里的 Next Step（无需再问用户 Day/主题，除非 progress 没写清楚）
