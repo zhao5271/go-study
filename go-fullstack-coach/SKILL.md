@@ -51,6 +51,7 @@ Use when the user asks to:
 
 ## 工作区与目录约定（避免重开窗口迷路）
 - 仓库根目录：`/Users/zhang/Desktop/go-study/codex`
+- 根目录说明（重开窗口先看）：`/Users/zhang/Desktop/go-study/codex/README.md`
 - Go module 在：`/Users/zhang/Desktop/go-study/codex/go-learning`
   - 任何 `go run/go test/go mod` **都必须在 `go-learning/` 目录执行**（根目录不是 Go module，会报 `cannot find main module`）
 - 入口索引（强烈建议重开窗口先看）：`/Users/zhang/Desktop/go-study/codex/go-learning/README.md`
