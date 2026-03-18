@@ -179,11 +179,15 @@ flowchart TD
 ## Git 提交规范
 - **commit message 一律使用中文**（从现在开始；不回改历史提交）。
 - 建议格式：`学习：...` / `笔记：...` / `技能：...` / `杂项：...`（按实际内容选 1 个前缀即可）。
-- 默认行为：每次完成一个“可运行代码 + 笔记 + 外部记忆同步”的闭环后，执行 `git status` → `git add` → `git commit`（不自动 push，除非用户要求）。
+- 默认工作分支：`codex/go-study`
+  - 自动提交前必须先确认当前分支：`git rev-parse --abbrev-ref HEAD`
+  - 若不在 `codex/go-study`：先切换 `git switch codex/go-study`（不存在则 `git switch -c codex/go-study`）
+  - 说明：同一仓库可能同时存在“桌面目录 + worktree 目录”，它们的分支可能不同；**自动提交只在当前工作区执行**，避免误把改动提交到另一个工作区（例如 `main`）。
+- 默认行为：每次完成一个“可运行代码 + 笔记 + 外部记忆同步”的闭环后，执行 `git status` → `git add -A` → `git commit -m "<中文 message>"`（不自动 push，除非用户要求）。
 
 ## Skill 自身更新流程（让重开窗口保持效果）
 当你修改了本仓库的 `go-fullstack-coach/SKILL.md`：
-1) 同步安装到全局 skills：`cd /Users/zhang/Desktop/go-study/codex && npx skills add ./go-fullstack-coach -g -y --copy`
+1) 同步安装到全局 skills：在仓库根目录执行 `npx skills add ./go-fullstack-coach -g -y --copy`（可用 `git rev-parse --show-toplevel` 确认当前目录）
 2) 再用中文提交：`git add go-fullstack-coach/SKILL.md && git commit -m "技能：<一句话>"`
 
 ## 默认学习路线（用户不指定时）
