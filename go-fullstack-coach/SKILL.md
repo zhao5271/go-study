@@ -27,6 +27,7 @@ description: Teach Go fullstack (API + MySQL) to an experienced Vue3/TypeScript 
 - `notes/go/glossary.md`：新增本次出现的新术语（每条 3–8 行）
 - `notes/go/patterns.md`：沉淀可复用模板（HTTP/DB/错误码/事务等）
 - `notes/go/pitfalls.md`：记录本次踩坑与规避方法（1–3 行/条）
+- `go-learning/README.md`：当 `cmd/`/`internal/`/`infra/` 结构或运行约定变化时必须同步更新（方便重开窗口快速定位）
 
 若本次学习没有新增术语/模式/坑点，也要在回复里明确写一句“外部记忆已检查，无需新增”。
 
@@ -52,6 +53,7 @@ Use when the user asks to:
 - 仓库根目录：`/Users/zhang/Desktop/go-study/codex`
 - Go module 在：`/Users/zhang/Desktop/go-study/codex/go-learning`
   - 任何 `go run/go test/go mod` **都必须在 `go-learning/` 目录执行**（根目录不是 Go module，会报 `cannot find main module`）
+- 入口索引（强烈建议重开窗口先看）：`/Users/zhang/Desktop/go-study/codex/go-learning/README.md`
 - 可运行示例入口：`go-learning/cmd/dayNN/*`（以及更细的子目录，如 `go-learning/cmd/day03/02_interfaces_embedding_ex1`）
 - 可复用内部包：`go-learning/internal/...`
   - HTTP 工具包约定：`go-learning/internal/httpkit`（统一 JSON 响应 + 分页 query 解析）
