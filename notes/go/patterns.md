@@ -34,6 +34,18 @@
 - repo 接口尽量表达业务语义（如 `ListUsers`），不要暴露 SQL/驱动细节。
 - 横切能力（log/metrics）优先用装饰器：`type LoggingRepo struct { Repo }`。
 
+## 编译期接口校验（防止漏实现）
+- 场景：重构 repo/service、拆包或改接收者类型后，避免“以为实现了接口，实际没实现”。
+- 模式：用空标识符接收接口类型的赋值，在编译期检查。
+```go
+type UserRepo interface{ Ping() error }
+type MySQLUserRepo struct{}
+
+func (*MySQLUserRepo) Ping() error { return nil }
+
+var _ UserRepo = (*MySQLUserRepo)(nil)
+```
+
 ## Table-driven tests 模板
 ```go
 tests := []struct {
