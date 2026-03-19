@@ -6,11 +6,7 @@ func main() {
 	fmt.Println("== KP: vars/const/scope/_/iota ==") // Output: == KP: vars/const/scope/_/iota ==
 
 	demoScope()
-	fmt.Println("----") // Output: ----
-
 	demoBlankIdentifier()
-	fmt.Println("----") // Output: ----
-
 	demoIota()
 }
 
@@ -35,7 +31,7 @@ func demoBlankIdentifier() {
 
 	names := []string{"alice", "bob"}
 	for _, name := range names {
-		fmt.Printf("name=%s\n", name) // Output: name=alice (第二行 Output: name=bob)
+		fmt.Printf("name=%s\n", name) // Output: name=alice（第一次迭代）；Output: name=bob（第二次迭代）
 	}
 }
 
@@ -64,4 +60,3 @@ func demoIota() {
 	fmt.Printf("RoleAdmin=%d RoleEditor=%d RoleViewer=%d\n", RoleAdmin, RoleEditor, RoleViewer) // Output: RoleAdmin=1 RoleEditor=2 RoleViewer=3
 	fmt.Printf("KB=%d MB=%d GB=%d\n", KB, MB, GB)                                              // Output: KB=1024 MB=1048576 GB=1073741824
 }
-
