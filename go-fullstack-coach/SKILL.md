@@ -27,6 +27,7 @@ description: Teach Go fullstack (API + MySQL) to an experienced Vue3/TypeScript 
 - `notes/go/glossary.md`：新增本次出现的新术语（每条 3–8 行）
 - `notes/go/patterns.md`：沉淀可复用模板（HTTP/DB/错误码/事务等）
 - `notes/go/pitfalls.md`：记录本次踩坑与规避方法（1–3 行/条）
+- `notes/go/context-pack.md`：更新“快速进度/规则摘要/最近更新”，保证新对话只贴这一份就能恢复上下文
 - `go-learning/README.md`：当 `cmd/`/`internal/`/`infra/` 结构或运行约定变化时必须同步更新（方便重开窗口快速定位）
 
 若本次学习没有新增术语/模式/坑点，也要在回复里明确写一句“外部记忆已检查，无需新增”。
@@ -37,7 +38,7 @@ Use when the user asks to:
 - “开始学习 / 开始今天学习 / 开始 DayXX 学习”（默认进入“开始今天学习”流程）
 - “继续学习”（默认从 `notes/go/progress.md` 的 Next Step 接着往下讲）
 - “查看学习进度 / 现在到第几天了 / 学到哪了”（读取 `notes/go/progress.md` 并用绝对路径指向相关笔记）
-- “知识点：xxx / 讲解：xxx / 我想学：xxx”（进入“知识点点播模式”，按你给的知识点就地讲解并落盘到笔记 + 外部记忆）
+- “知识点：xxx / 讲解：xxx / 我想学：xxx”（优先交给 `knowledge-point-notes` 生成“知识点笔记”与外部记忆；本 skill 只做 Day 路线推进）
 - Learn Go/Golang from a TS/Vue/Node background
 - Build backend APIs in Go (REST) with MySQL
 - Learn Go concurrency/runtime/GC/scheduler
@@ -91,9 +92,9 @@ docker compose stop
 | A3. 查看学习进度 | “查看学习进度/现在到第几天了/学到哪了” | 无 | 读取并总结 `notes/go/progress.md`（指出当前 Day 与下一步） |
 | B. 代码评审 | “review 这段 Go 代码/这个 PR/这段报错” | 代码/报错/路径 | 改进版代码 + 解释取舍（可写回文件） |
 | C. Debug 报错 | “这段 go run/go build 报错” | 报错栈 + 路径 | 定位原因 + 修复 + 验证步骤 |
-| D. 复盘/压缩上下文 | “对话太长/帮我压缩” | 无 | 更新 `notes/go/progress.md` + 建议开新线程用 `notes/go/context-pack.md` |
+| D. 复盘/压缩上下文 | “对话太长/帮我压缩” | 无 | 更新 `notes/go/context-pack.md`（可直接贴到新对话）+ 必要时同步 `notes/go/progress.md` |
 | E. 面试模式 | “按面试问我/出题” | 主题/岗位级别 | 问题清单 + 标准答案要点 + 追问点 |
-| F. 知识点点播（你提点我讲） | “知识点：xxx/讲解：xxx/我想学：xxx” | 1 个知识点（可大可小） | `notes/go/kp/NN-<简短中文>.md`（必要时加 `go-learning/cmd/kp/<topic-slug>` 代码）+ 外部记忆同步 |
+| F. 知识点点播（改用新 skill） | “知识点：xxx/讲解：xxx/我想学：xxx” | 1 个知识点（可大可小） | 使用 `knowledge-point-notes`：生成 `notes/go/kp/NN-*.md` +（可选）`go-learning/cmd/kp/<slug>` + 外部记忆同步 |
 
 ```mermaid
 flowchart TD
@@ -105,7 +106,7 @@ flowchart TD
   K -- "完整" --> O["输出：讲清楚 + 代码 + 笔记"]
   K -- "缺失" --> W["上网补齐(官方优先) + 写 References"]
   W --> O
-  O --> P["更新外部记忆(progress/glossary/patterns/pitfalls) + 中文 commit"]
+  O --> P["更新外部记忆(progress/glossary/patterns/pitfalls/context-pack)"]
 ```
 
 ## 输出格式（更易理解优先）
@@ -126,6 +127,9 @@ flowchart TD
 **参考答案不要写“照抄/自行修改/见某文件”，要给“可以直接粘贴使用的主要代码（例如完整函数/常量块）”。**  
 笔记里不要贴与知识点无关的“分隔输出/噪音代码”（例如纯分割线打印）；示例应尽量只输出与知识点相关的内容。  
 如果不适合：用 1–2 个“自检问题/变体改造”代替即可。
+
+### 知识点运用示例（标题约定）
+在笔记里，把“题目/练习题”统一命名为 **“知识点运用示例”**，并放在对应知识点下面（不要把所有题目/答案集中到文末）。
 
 ### 讲解风格（工程交付优先）
 - 每个点都必须能落到“后台管理 API”项目里（登录鉴权/列表分页/后台管理/幂等/超时/重试等）。
@@ -217,7 +221,9 @@ flowchart TD
   - 自动提交前必须先确认当前分支：`git rev-parse --abbrev-ref HEAD`
   - 若不在 `codex/go-study`：先切换 `git switch codex/go-study`（不存在则 `git switch -c codex/go-study`）
   - 说明：同一仓库可能同时存在“桌面目录 + worktree 目录”，它们的分支可能不同；**自动提交只在当前工作区执行**，避免误把改动提交到另一个工作区（例如 `main`）。
-- 默认行为：每次完成一个“可运行代码 + 笔记 + 外部记忆同步”的闭环后，执行 `git status` → `git add -A` → `git commit -m "<中文 message>"`（不自动 push，除非用户要求）。
+- 默认行为（已调整）：**不自动提交**。
+  - 每次完成一个“可运行代码 + 笔记 + 外部记忆同步”的闭环后：只执行 `git status` 供用户确认变更。
+  - 仅当用户明确说“git 提交/提交这些改动”时，才执行：`git add -A` → `git commit -m "<中文 message>"`（不自动 push，除非用户要求）。
 
 ## Skill 自身更新流程（让重开窗口保持效果）
 当你修改了本仓库的 `go-fullstack-coach/SKILL.md`：

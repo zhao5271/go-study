@@ -95,3 +95,36 @@
 ## iota（常量计数器）
 - `iota` 只在 `const (...)` 块内生效：从 0 开始，每行 +1；每个 const 块会重置。
 - 常用于：枚举常量（加 `+1` 跳过 0）、位标志（`1 << (10*iota)`）。
+
+## Conversion（显式类型转换）
+- Go 不做隐式数值类型转换；不同数值类型相加/比较需要显式转换（例如 `int64(x)`）。
+- 转换可能导致溢出/截断（`float64→int` 截断小数；`int64→int` 可能溢出）。
+
+## fmt verbs（格式化动词）
+- 常用：`%d`（整数）、`%f`（浮点）、`%s`（字符串）、`%q`（带引号字符串）、`%v`（默认）、`%T`（类型）。
+- 用 `%T` 快速确认值的真实类型，减少“类型以为对了”的调试时间。
+
+## strconv（字符串转换）
+- `strconv.Atoi("123")`：string→int；`strconv.Itoa(123)`：int→string。
+- 别把 `string(123)` 当成 `"123"`：它会把整数当字符码点转换（通常得到单字符）。
+
+## rune / byte（字符码点 / 字节）
+- `rune` = `int32`：表示一个 Unicode code point（更像“字符”）。
+- `byte` = `uint8`：表示一个字节（更像“原始数据”）。
+- `string` 是 UTF-8 字节序列：`len(s)` 是字节数；`s[i]` 取到的是 `byte`；`for range s` 才是按 `rune` 迭代。
+
+## unicode/utf8（UTF-8 工具包）
+- `utf8.RuneCountInString(s)`：统计 rune 数（“字符数”）。
+- `utf8.DecodeRuneInString(s)`：从字符串解码第一个 rune（做前缀解析时常用）。
+
+## Bit flag（位标志）
+- 用位运算把“多个布尔开关/权限”压到一个整数里：`mask := Read | Export`。
+- 判断用 `(mask & Read) != 0`（括号不要省，避免误读/写错）。
+
+## Untyped constant（无类型常量）
+- `const x = 1` 在赋值前没有固定类型，会按上下文“落到”某个具体类型（只要能表示）。
+- 一旦变成变量（例如 `var x = 1`），它就有了固定类型（通常是 `int`），跨类型运算必须显式转换。
+
+## Comparable（可比较）
+- 可用 `==/!=` 比较的类型称为 comparable（大部分基础类型都可以）。
+- `slice/map/func` 不能互相 `==`（只能与 `nil` 比），工程上常用 `len(s)==0` 或 `maps.Equal` 等替代手段（后续再展开）。

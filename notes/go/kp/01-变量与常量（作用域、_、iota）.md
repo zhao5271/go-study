@@ -52,16 +52,20 @@ if true {
 fmt.Printf("outer x=%d\n", x) // Output: outer x=1
 ```
 
-### G. 怎么运行（命令 + 预期现象）
-见本文后面的“可运行示例”。
-
-### H. 练习题（1–3 题）
-练习 1：修复遮蔽，让外层变量真的被更新  
+### 知识点运用示例
+示例 1.1：修复遮蔽，让外层变量真的被更新  
 - 要求：把上面片段里的 `x := 2` 改成 `x = 2`  
 - 验收：输出里的 `outer x=2`
 
-### I. 参考答案
-见文末“参考答案（主要代码片段）”。
+参考实现（主要代码片段）：
+```go
+x := 1
+if true {
+	x = 2
+	fmt.Printf("inner x=%d\n", x) // Output: inner x=2
+}
+fmt.Printf("outer x=%d\n", x) // Output: outer x=2
+```
 
 ---
 
@@ -100,16 +104,17 @@ for _, name := range names {
 }
 ```
 
-### G. 怎么运行（命令 + 预期现象）
-见本文后面的“可运行示例”。
-
-### H. 练习题（1–3 题）
-练习 2：不要丢弃余数，把它也打印出来  
+### 知识点运用示例
+示例 2.1：不要丢弃余数，把它也打印出来  
 - 要求：把 `q, _ := divMod(10,3)` 改成 `q, rem := ...` 并打印 `rem`  
 - 验收：输出里出现 `10%3 remainder=1`
 
-### I. 参考答案
-见文末“参考答案（主要代码片段）”。
+参考实现（主要代码片段）：
+```go
+q, rem := divMod(10, 3)
+fmt.Printf("10/3 quotient=%d\n", q)     // Output: 10/3 quotient=3
+fmt.Printf("10%%3 remainder=%d\n", rem) // Output: 10%3 remainder=1
+```
 
 ---
 
@@ -156,16 +161,22 @@ const (
 )
 ```
 
-### G. 怎么运行（命令 + 预期现象）
-见本文后面的“可运行示例”。
-
-### H. 练习题（1–3 题）
-练习 3：扩展枚举常量，增加 `RoleGuest`  
+### 知识点运用示例
+示例 3.1：扩展枚举常量，增加 `RoleGuest`  
 - 要求：在 Role 的 const 块里加 `RoleGuest`，并把它打印出来  
 - 验收：`RoleGuest=4`（连续递增）
 
-### I. 参考答案
-见文末“参考答案（主要代码片段）”。
+参考实现（主要代码片段）：
+```go
+const (
+	RoleAdmin Role = iota + 1
+	RoleEditor
+	RoleViewer
+	RoleGuest
+)
+
+fmt.Printf("RoleGuest=%d\n", RoleGuest) // Output: RoleGuest=4
+```
 
 ---
 
@@ -194,63 +205,7 @@ KB=1024 MB=1048576 GB=1073741824
 
 ---
 
-## 参考答案（主要代码片段）
-
-说明：下面给的是“需要替换/新增的主要代码”。  
-操作方式：打开 `go-learning/cmd/kp/vars-const-scope-iota/main.go`，把对应函数/常量块替换掉，然后重新 `go run`。
-
-### 参考答案 1：练习 1（修复遮蔽）
-把原来的 `demoScope()` 替换为：
-```go
-func demoScope() {
-	fmt.Println("[1] scope + block scope + := shadowing (fixed)") // Output: [1] scope + block scope + := shadowing (fixed)
-
-	x := 1
-	if true {
-		x = 2
-		fmt.Printf("inner x=%d\n", x) // Output: inner x=2
-	}
-	fmt.Printf("outer x=%d\n", x) // Output: outer x=2
-}
-```
-
-### 参考答案 2：练习 2（打印余数）
-把原来的 `demoBlankIdentifier()` 替换为：
-```go
-func demoBlankIdentifier() {
-	fmt.Println("[2] blank identifier (_) -> keep remainder") // Output: [2] blank identifier (_) -> keep remainder
-
-	q, rem := divMod(10, 3)
-	fmt.Printf("10/3 quotient=%d\n", q)     // Output: 10/3 quotient=3
-	fmt.Printf("10%%3 remainder=%d\n", rem) // Output: 10%3 remainder=1
-
-	names := []string{"alice", "bob"}
-	for _, name := range names {
-		fmt.Printf("name=%s\n", name) // Output: name=alice（第一次迭代）；Output: name=bob（第二次迭代）
-	}
-}
-```
-
-### 参考答案 3：练习 3（增加 RoleGuest）
-把 Role 的 const 块替换为：
-```go
-const (
-	RoleAdmin Role = iota + 1
-	RoleEditor
-	RoleViewer
-	RoleGuest
-)
-```
-
-并在 `demoIota()` 增加一行打印：
-```go
-fmt.Printf("RoleGuest=%d\n", RoleGuest) // Output: RoleGuest=4
-```
-
----
-
 ## References
 - 官方：Go Spec（Constants / Iota / Scopes / Blank identifier）https://go.dev/ref/spec  
 - 官方：Effective Go（Constants / iota 常见用法）https://go.dev/doc/effective_go  
 - 官方：A Tour of Go（Constants）https://go.dev/tour/basics/15
-

@@ -71,3 +71,58 @@ const (
 	RoleViewer
 )
 ```
+
+## 参数解析（string → int）
+- 模式：用 `strconv.Atoi` 做转换；失败就 wrap 并返回，让上层统一映射错误码/HTTP status。
+```go
+page, err := strconv.Atoi(pageStr)
+if err != nil {
+	return 0, fmt.Errorf("invalid page: %w", err)
+}
+```
+
+## 参数解析（带默认值 + 边界）
+- 场景：分页 `page/size`、筛选 `status`、导出 `limit` 等。
+```go
+func parseIntQuery(v string, def int, min int, max int) (int, error) {
+	if v == "" {
+		return def, nil
+	}
+	n, err := strconv.Atoi(v)
+	if err != nil {
+		return 0, fmt.Errorf("must be int: %w", err)
+	}
+	if n < min || n > max {
+		return 0, fmt.Errorf("out of range [%d..%d]: %d", min, max, n)
+	}
+	return n, nil
+}
+```
+
+## 安全数值转换（int64 → int）
+- 场景：DB 扫描/协议字段是 `int64`，但你在业务里需要 `int`（下标/长度/分页）。
+- 模式：在边界处做显式转换 + 位宽判断（跨平台更稳）。
+```go
+func int64ToInt(v int64) (int, error) {
+	if strconv.IntSize == 32 {
+		if v < math.MinInt32 || v > math.MaxInt32 {
+			return 0, fmt.Errorf("int overflow: %d", v)
+		}
+	}
+	return int(v), nil
+}
+```
+
+## 位标志（权限/状态）
+- 场景：用户权限（READ/WRITE/EXPORT）、状态位（禁用/冻结/需要改密）等。
+```go
+type Perm uint64
+
+const (
+	PermRead Perm = 1 << iota
+	PermWrite
+	PermExport
+)
+
+func hasPerm(mask, p Perm) bool { return (mask&p) != 0 }
+```
