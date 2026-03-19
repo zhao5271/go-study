@@ -55,5 +55,18 @@ for _, tt := range tests {
 
 ## 项目结构（学习用最小版）
 - `go-learning/cmd/dayNN/*`：每个知识点一个可运行入口
+- `go-learning/cmd/kp/*`：知识点点播示例入口（不改变 Day 进度，用于补课/查缺补漏）
 - `go-learning/internal/...`：可复用逻辑 + 可测试
 - 笔记：`notes/go/dayNN-*.md` + 索引文件（progress/glossary/patterns/pitfalls）
+
+## 枚举常量（iota）
+- 模式：用 `type` + `const` 表达稳定枚举（角色/状态/错误类别），避免 magic number/string。
+```go
+type Role int
+
+const (
+	RoleAdmin Role = iota + 1
+	RoleEditor
+	RoleViewer
+)
+```

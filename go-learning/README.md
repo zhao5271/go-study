@@ -10,6 +10,7 @@ cd /Users/zhang/Desktop/go-study/codex/go-learning
 
 - `cmd/`
   - `cmd/day01/`、`cmd/day02/`…：每天的可运行示例入口（每个子目录都是一个 `package main`）
+  - `cmd/kp/`：知识点点播示例入口（按知识点 slug 归档）
   - `cmd/legacy/`：历史/废弃示例（保留做对照）
 - `internal/`：可复用逻辑（供多个示例共享）
   - `internal/httpkit/`：统一 JSON 响应与 query 解析（`WriteJSON/WriteError/ParsePageSize`）
@@ -65,4 +66,3 @@ docker compose stop
 - `internal/` 新增可复用包或对外 API 变更
 - `infra/` 目录结构/端口/初始化脚本变更
 - 统一的运行方式、环境变量约定变更
-
