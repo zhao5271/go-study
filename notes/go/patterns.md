@@ -58,6 +58,7 @@ for _, tt := range tests {
 - `go-learning/cmd/kp/*`：知识点点播示例入口（不改变 Day 进度，用于补课/查缺补漏）
 - `go-learning/internal/...`：可复用逻辑 + 可测试
 - 笔记：`notes/go/dayNN-*.md` + 索引文件（progress/glossary/patterns/pitfalls）
+- 点播笔记：`notes/go/kp/NN-<简短中文>.md`
 
 ## 枚举常量（iota）
 - 模式：用 `type` + `const` 表达稳定枚举（角色/状态/错误类别），避免 magic number/string。

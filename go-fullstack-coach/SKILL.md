@@ -22,7 +22,7 @@ description: Teach Go fullstack (API + MySQL) to an experienced Vue3/TypeScript 
 4) 课后更新索引（progress/glossary/patterns/pitfalls），必要时补 `## References`
 
 ### 外部记忆更新（强制）
-**只要你生成/更新了任意学习笔记（`notes/go/day*.md` 或 `notes/go/kp-*.md`），就必须同步更新本地外部记忆文件**（哪怕只改了 1 行笔记也一样）：
+**只要你生成/更新了任意学习笔记（`notes/go/day*.md` 或 `notes/go/kp/*.md`），就必须同步更新本地外部记忆文件**（哪怕只改了 1 行笔记也一样）：
 - `notes/go/progress.md`：更新“已完成/进行中/下一步”
 - `notes/go/glossary.md`：新增本次出现的新术语（每条 3–8 行）
 - `notes/go/patterns.md`：沉淀可复用模板（HTTP/DB/错误码/事务等）
@@ -93,7 +93,7 @@ docker compose stop
 | C. Debug 报错 | “这段 go run/go build 报错” | 报错栈 + 路径 | 定位原因 + 修复 + 验证步骤 |
 | D. 复盘/压缩上下文 | “对话太长/帮我压缩” | 无 | 更新 `notes/go/progress.md` + 建议开新线程用 `notes/go/context-pack.md` |
 | E. 面试模式 | “按面试问我/出题” | 主题/岗位级别 | 问题清单 + 标准答案要点 + 追问点 |
-| F. 知识点点播（你提点我讲） | “知识点：xxx/讲解：xxx/我想学：xxx” | 1 个知识点（可大可小） | `notes/go/kp-<topic-slug>.md`（必要时加 `go-learning/cmd/kp/<topic-slug>` 代码）+ 外部记忆同步 |
+| F. 知识点点播（你提点我讲） | “知识点：xxx/讲解：xxx/我想学：xxx” | 1 个知识点（可大可小） | `notes/go/kp/NN-<简短中文>.md`（必要时加 `go-learning/cmd/kp/<topic-slug>` 代码）+ 外部记忆同步 |
 
 ```mermaid
 flowchart TD
@@ -172,7 +172,7 @@ flowchart TD
 当用户只给出一个“知识点/概念/技术点”时：
 1) 你先把它拆成 **1–3 个可消化的小点**，优先讲“最能立刻落地到后台管理 API”的部分。  
 2) 在 D/E 里主动做一次 **“复习串联”**：点名本节会复用到的已学知识（并引用对应的 Day 笔记/示例路径）。  
-3) 产物落盘到：`notes/go/kp-<topic-slug>.md`（内容结构遵循“内容清单”；末尾可加 `## 关联复习`）。  
+3) 产物落盘到：`notes/go/kp/NN-<简短中文>.md`（内容结构遵循“内容清单”；末尾可加 `## 关联复习`）。  
 4) 若该知识点适合演示：把最小可运行代码写到 `go-learning/cmd/kp/<topic-slug>/main.go`；否则只写笔记，并说明“为什么本节不写可运行代码”（例如需要过多未学前置）。  
 5) 课后照常更新外部记忆（progress/glossary/patterns/pitfalls），并明确写一句“外部记忆已更新/已检查”。  
 
@@ -203,7 +203,7 @@ flowchart TD
 
 ## 笔记与外部记忆（防 token 爆炸）
 - 当天笔记：`notes/go/day<NN>-<topic-slug>.md`
-- 点播笔记：`notes/go/kp-<topic-slug>.md`（不一定改变 Day 进度，用于补课/查缺补漏）
+- 点播笔记：`notes/go/kp/NN-<简短中文>.md`（不一定改变 Day 进度，用于补课/查缺补漏）
 - 课前必读：`notes/go/progress.md`、`notes/go/glossary.md`、`notes/go/patterns.md`、`notes/go/pitfalls.md`
 - 课后必更：progress +（必要时）补 glossary/patterns/pitfalls
 - 只要用了 web fallback：笔记末尾加 `## References`（官方/社区 + 用途）
