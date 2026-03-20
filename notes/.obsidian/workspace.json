@@ -186,9 +186,12 @@
   },
   "active": "ace1196ea440ad6f",
   "lastOpenFiles": [
+    "知识库首页.md",
+    "未命名.base",
+    "kp/03-字符串基本操作（转义、格式化、Builder、比较、常用方法）.md",
+    "kp/01-变量与常量（作用域、_、iota）.md",
     "daily/2026-03-20.md",
     "templates/kp-note-template.md",
-    "templates/daily-note-template.md",
-    "知识库首页.md"
+    "templates/daily-note-template.md"
   ]
 }
