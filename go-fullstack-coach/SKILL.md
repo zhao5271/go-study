@@ -9,25 +9,25 @@ description: Teach Go fullstack (API + MySQL) to an experienced Vue3/TypeScript 
 
 ## 重开窗口/新对话启动（必须做）
 目标：用户重开窗口后，说“开始学习”也能保持同样的教学节奏、产物结构与本地外部记忆。
-1) 打开并阅读外部记忆索引：`notes/go/progress.md`（当前进度/下一步/已完成）
-2) 打开并阅读：`notes/go/glossary.md`、`notes/go/patterns.md`、`notes/go/pitfalls.md`（保持术语/套路/坑点一致）
-3) 若用户说“上下文太长/重开窗口”：提示用户把 `notes/go/context-pack.md` 复制到新对话首条消息（无需重复粘贴旧对话）
+1) 打开并阅读外部记忆索引：`notes/progress.md`（当前进度/下一步/已完成）
+2) 打开并阅读：`notes/glossary.md`、`notes/patterns.md`、`notes/pitfalls.md`（保持术语/套路/坑点一致）
+3) 若用户说“上下文太长/重开窗口”：提示用户把 `notes/context-pack.md` 复制到新对话首条消息（无需重复粘贴旧对话）
 4) 任何笔记改动后：必须同步更新外部记忆（见下方“外部记忆更新（强制）”）
 
 ## 快速开始（执行提示精简版）
 每次你只需要做 4 件事：
-1) 读索引（外部记忆）：`notes/go/progress.md` + `notes/go/glossary.md` + `notes/go/patterns.md` + `notes/go/pitfalls.md`
+1) 读索引（外部记忆）：`notes/progress.md` + `notes/glossary.md` + `notes/patterns.md` + `notes/pitfalls.md`
 2) 选一个操作（看下方“操作面板”）
-3) 产出：可运行代码 + 当天笔记（`notes/go/dayNN-*.md` / `dayNN-X-*.md`）
+3) 产出：可运行代码 + 当天笔记（`notes/dayNN-*.md` / `dayNN-X-*.md`）
 4) 课后更新索引（progress/glossary/patterns/pitfalls），必要时补 `## References`
 
 ### 外部记忆更新（强制）
-**只要你生成/更新了任意学习笔记（`notes/go/day*.md` 或 `notes/go/kp/*.md`），就必须同步更新本地外部记忆文件**（哪怕只改了 1 行笔记也一样）：
-- `notes/go/progress.md`：更新“已完成/进行中/下一步”
-- `notes/go/glossary.md`：新增本次出现的新术语（每条 3–8 行）
-- `notes/go/patterns.md`：沉淀可复用模板（HTTP/DB/错误码/事务等）
-- `notes/go/pitfalls.md`：记录本次踩坑与规避方法（1–3 行/条）
-- `notes/go/context-pack.md`：更新“快速进度/规则摘要/最近更新”，保证新对话只贴这一份就能恢复上下文
+**只要你生成/更新了任意学习笔记（`notes/day*.md` 或 `notes/kp/*.md`），就必须同步更新本地外部记忆文件**（哪怕只改了 1 行笔记也一样）：
+- `notes/progress.md`：更新“已完成/进行中/下一步”
+- `notes/glossary.md`：新增本次出现的新术语（每条 3–8 行）
+- `notes/patterns.md`：沉淀可复用模板（HTTP/DB/错误码/事务等）
+- `notes/pitfalls.md`：记录本次踩坑与规避方法（1–3 行/条）
+- `notes/context-pack.md`：更新“快速进度/规则摘要/最近更新”，保证新对话只贴这一份就能恢复上下文
 - `go-learning/README.md`：当 `cmd/`/`internal/`/`infra/` 结构或运行约定变化时必须同步更新（方便重开窗口快速定位）
 
 若本次学习没有新增术语/模式/坑点，也要在回复里明确写一句“外部记忆已检查，无需新增”。
@@ -36,8 +36,8 @@ description: Teach Go fullstack (API + MySQL) to an experienced Vue3/TypeScript 
 
 Use when the user asks to:
 - “开始学习 / 开始今天学习 / 开始 DayXX 学习”（默认进入“开始今天学习”流程）
-- “继续学习”（默认从 `notes/go/progress.md` 的 Next Step 接着往下讲）
-- “查看学习进度 / 现在到第几天了 / 学到哪了”（读取 `notes/go/progress.md` 并用绝对路径指向相关笔记）
+- “继续学习”（默认从 `notes/progress.md` 的 Next Step 接着往下讲）
+- “查看学习进度 / 现在到第几天了 / 学到哪了”（读取 `notes/progress.md` 并用绝对路径指向相关笔记）
 - “知识点：xxx / 讲解：xxx / 我想学：xxx”（优先交给 `knowledge-point-notes` 生成“知识点笔记”与外部记忆；本 skill 只做 Day 路线推进）
 - Learn Go/Golang from a TS/Vue/Node background
 - Build backend APIs in Go (REST) with MySQL
@@ -87,14 +87,14 @@ docker compose stop
 
 | 操作 | 触发方式（用户怎么说） | 输入 | 输出（文件/结果） |
 |---|---|---|---|
-| A. 开始今天学习（默认） | “开始今天/DayNN 学习：xxx” | Day 编号 + 主题 | `go-learning/cmd/dayNN/*` + `notes/go/dayNN-*.md` |
-| A2. 继续学习（默认接着学） | “继续学习” | 无 | 读取 `notes/go/progress.md` 的 Next Step → 按“内容清单”讲清楚并落盘 |
-| A3. 查看学习进度 | “查看学习进度/现在到第几天了/学到哪了” | 无 | 读取并总结 `notes/go/progress.md`（指出当前 Day 与下一步） |
+| A. 开始今天学习（默认） | “开始今天/DayNN 学习：xxx” | Day 编号 + 主题 | `go-learning/cmd/dayNN/*` + `notes/dayNN-*.md` |
+| A2. 继续学习（默认接着学） | “继续学习” | 无 | 读取 `notes/progress.md` 的 Next Step → 按“内容清单”讲清楚并落盘 |
+| A3. 查看学习进度 | “查看学习进度/现在到第几天了/学到哪了” | 无 | 读取并总结 `notes/progress.md`（指出当前 Day 与下一步） |
 | B. 代码评审 | “review 这段 Go 代码/这个 PR/这段报错” | 代码/报错/路径 | 改进版代码 + 解释取舍（可写回文件） |
 | C. Debug 报错 | “这段 go run/go build 报错” | 报错栈 + 路径 | 定位原因 + 修复 + 验证步骤 |
-| D. 复盘/压缩上下文 | “对话太长/帮我压缩” | 无 | 更新 `notes/go/context-pack.md`（可直接贴到新对话）+ 必要时同步 `notes/go/progress.md` |
+| D. 复盘/压缩上下文 | “对话太长/帮我压缩” | 无 | 更新 `notes/context-pack.md`（可直接贴到新对话）+ 必要时同步 `notes/progress.md` |
 | E. 面试模式 | “按面试问我/出题” | 主题/岗位级别 | 问题清单 + 标准答案要点 + 追问点 |
-| F. 知识点点播（改用新 skill） | “知识点：xxx/讲解：xxx/我想学：xxx” | 1 个知识点（可大可小） | 使用 `knowledge-point-notes`：生成 `notes/go/kp/NN-*.md` +（可选）`go-learning/cmd/kp/<slug>` + 外部记忆同步 |
+| F. 知识点点播（改用新 skill） | “知识点：xxx/讲解：xxx/我想学：xxx” | 1 个知识点（可大可小） | 使用 `knowledge-point-notes`：生成 `notes/kp/NN-*.md` +（可选）`go-learning/cmd/kp/<slug>` + 外部记忆同步 |
 
 ```mermaid
 flowchart TD
@@ -160,7 +160,7 @@ flowchart TD
 目标：让学习曲线更平滑；示例代码只引入“当前要讲的点”，避免夹带未来知识点导致理解吃力。
 
 **规则 1：示例代码只允许使用两类知识**
-1) `notes/go/progress.md` 里“已完成”的知识点（默认认为你已学过）  
+1) `notes/progress.md` 里“已完成”的知识点（默认认为你已学过）  
 2) 本次回复正在讲的 1–3 个知识点（新增点）
 
 **规则 2：禁止在示例里“偷跑未来知识点”**
@@ -178,7 +178,7 @@ flowchart TD
 当用户只给出一个“知识点/概念/技术点”时：
 1) 你先把它拆成 **1–3 个可消化的小点**，优先讲“最能立刻落地到后台管理 API”的部分。  
 2) 主动做一次 **“复习串联”**：把会用到的已学知识用 3–8 行写成摘要（**不要写 `/Users/.../xxx.md:行号` 这种引用路径**，尽量让读者不跳出本笔记也能看懂）。  
-3) 产物落盘到：`notes/go/kp/NN-<简短中文>.md`（内容结构遵循“内容清单”；末尾可加 `## 关联复习`）。  
+3) 产物落盘到：`notes/kp/NN-<简短中文>.md`（内容结构遵循“内容清单”；末尾可加 `## 关联复习`）。  
 4) 若该知识点适合演示：把最小可运行代码写到 `go-learning/cmd/kp/<topic-slug>/main.go`；否则只写笔记，并说明“为什么本节不写可运行代码”（例如需要过多未学前置）。  
 5) 课后照常更新外部记忆（progress/glossary/patterns/pitfalls），并明确写一句“外部记忆已更新/已检查”。  
 
@@ -208,9 +208,9 @@ flowchart TD
 - 数据库表结构/索引/约束：参考 `postgresql-table-design`
 
 ## 笔记与外部记忆（防 token 爆炸）
-- 当天笔记：`notes/go/day<NN>-<topic-slug>.md`
-- 点播笔记：`notes/go/kp/NN-<简短中文>.md`（不一定改变 Day 进度，用于补课/查缺补漏）
-- 课前必读：`notes/go/progress.md`、`notes/go/glossary.md`、`notes/go/patterns.md`、`notes/go/pitfalls.md`
+- 当天笔记：`notes/day<NN>-<topic-slug>.md`
+- 点播笔记：`notes/kp/NN-<简短中文>.md`（不一定改变 Day 进度，用于补课/查缺补漏）
+- 课前必读：`notes/progress.md`、`notes/glossary.md`、`notes/patterns.md`、`notes/pitfalls.md`
 - 课后必更：progress +（必要时）补 glossary/patterns/pitfalls
 - 只要用了 web fallback：笔记末尾加 `## References`（官方/社区 + 用途）
 
@@ -249,9 +249,9 @@ Day01：语法地基 → Day02：错误处理 → Day03：struct/接口（分层
 4) 否则：走 **A 开始今天学习（默认）**
 
 若用户只说“开始学习”但没给 Day/主题：
-1) 先读取 `notes/go/progress.md`
+1) 先读取 `notes/progress.md`
 2) 默认建议进入下一天（progress 里的 Next Step），并用一句话向用户确认今天主题即可。
 
 若用户只说“继续学习”：
-1) 先读取 `notes/go/progress.md`
+1) 先读取 `notes/progress.md`
 2) 直接进入 progress 里的 Next Step（无需再问用户 Day/主题，除非 progress 没写清楚）
